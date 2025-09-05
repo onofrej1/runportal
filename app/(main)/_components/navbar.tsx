@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "@/lib/auth-client";
-import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export const Navbar = () => {
   const router = useRouter();
@@ -26,9 +26,15 @@ export const Navbar = () => {
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex-shrink-0 flex items-center">
-              <Heart size={28} />
+              <Image
+                src="/images/runner.jpg"
+                alt="Dice"                
+                className="absolute -left-[110px]"
+                width={100}
+                height={100}
+              />
               <span className="ml-2 text-xl font-bold text-gray-800">
-                Online zoznamka
+                Bežecký portál
               </span>
             </div>
             <div className="flex-1 hidden sm:block sm:ml-6">
@@ -44,13 +50,13 @@ export const Navbar = () => {
                   href="/game"
                   className="text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Chcem sa zoznamit
+                  Termínovka
                 </Link>
                 <Link
                   href="/scoring"
                   className="text-gray-900 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Moj profil
+                  Blog
                 </Link>
                 <Link
                   href="/contact"

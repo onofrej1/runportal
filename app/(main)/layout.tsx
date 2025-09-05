@@ -47,14 +47,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
               <Link href="/photos">
                 <H3 className="flex gap-3 items-center">
-                  <Upload /> Nahrať fotky
+                  <Upload /> Moje registracie
                 </H3>
               </Link>
-              <Link href="/users">
+              {/*<Link href="/users">
                 <H3 className="flex gap-3 items-center">
-                  <Search /> Vyhľadávanie
+                  <Search /> 
                 </H3>
-              </Link>
+              </Link>*/}
               <Link href="/signout">
                 <H3 className="flex gap-3 items-center">
                   <LogOut color="#000000" /> Odhlasit

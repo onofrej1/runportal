@@ -127,7 +127,7 @@ export const CreateRegistration = z.object({
   firstName: stringValue,
   lastName: stringValue,
   dateOfBirth: z.coerce.date(),
-  gender: z.enum(["MAN", "WOMAN"]),
+  gender: z.enum(["MALE", "FEMALE"]),
   email: z.email(),
   runId: numberValue,
   nation: stringValue,
