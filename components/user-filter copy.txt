@@ -1,0 +1,224 @@
+"use client";
+
+import * as React from "react";
+import { useState } from "react";
+import { Check, ChevronDown, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { useQuery } from "@tanstack/react-query";
+import { getFilters, getPreferences } from "@/actions";
+import { FormField } from "@/types/resources";
+import Form from "./form/form";
+
+interface HorizontalFiltersProps {
+  onFilterChange?: (filters: FilterState) => void;
+}
+
+//export interface FilterState {
+//categories: string[];
+//priceRange: [number, number];
+//}
+
+export type FilterState = Record<string, number[]>;
+
+export default function HorizontalFilters({
+  onFilterChange,
+}: HorizontalFiltersProps) {
+  const { data: initFilters } = useQuery({
+    queryKey: ["getPreferences"],
+    refetchOnWindowFocus: false,
+    queryFn: () => getPreferences(),
+  });
+
+  const { data /*, isFetching*/ } = useQuery({
+    queryKey: ["getFilters"],
+    queryFn: () => getFilters(),
+  });
+
+  const [filters, setFilters] = useState<FilterState>();
+
+  React.useEffect(() => {
+    if (initFilters && Object.keys(initFilters).length > 0 && !filters) {
+      setFilters(initFilters);
+    }
+  }, [filters, initFilters]);
+
+  const toggleFilter = (type: keyof FilterState, value: number) => {
+    const currentValues = filters?.[type] || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+
+    const val = { ...filters, [type]: newValues };
+    if (val[type].length === 0) delete val[type];
+
+    setFilters(val);
+    onFilterChange?.(val);
+  };
+
+  const clearFilters = () => {
+    setFilters({});
+    onFilterChange?.({});
+  };
+
+  const ActiveFilterBadges = () => {
+    if (!data || !filters) return;
+    const activeFilters = Object.keys(filters)
+      .map((key) => {
+        const filter = filters[key as keyof typeof filters] || [];
+        const d = Object.keys(data)
+          .map((d) => data[d])
+          .flat();
+        const q = d.find((d) => d.id === Number(key));
+        return {
+          type: q,
+          value: q?.questionChoices.filter((f) => filter?.includes(f.id)),
+        };
+      })
+      .filter(Boolean);
+
+    if (activeFilters.length === 0) return null;
+
+    return (
+      <div className="flex flex-wrap gap-2 border border-gray-300 p-3">
+        {activeFilters.map((filter) => (
+          <div key={filter.type?.id}>
+            <div className="flex flex-wrap gap-1">
+              <strong>{filter.type?.title}</strong>
+              {filter.value?.map((choice) => (
+                <Badge
+                  key={`${choice.id}`}
+                  variant="outline"
+                  className="flex items-center gap-1 px-2 py-1"
+                >
+                  {choice.title}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 p-0 ml-1"
+                    onClick={() =>
+                      toggleFilter(choice.questionId.toString(), choice.id)
+                    }
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        ))}
+        {activeFilters.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-xs"
+            onClick={clearFilters}
+          >
+            <strong>Clear all</strong>
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  const categories = {
+    "basic-info": "Viac informacii",
+    "live-style": "Zivotny styl",
+    hobbys: "Zaujmy",
+  };
+
+  const fields: FormField[] = [
+    {
+      label: "Hladam",
+      name: "gender",
+      type: "select",
+      //onChange: (value) => toggleFilter('gender', value),
+      options: [
+        { value: "man", label: "Muza" },
+        { value: "woman", label: "Zenu" },
+      ],
+    },
+    { label: "Vek", name: "age", type: "range", min: 18, max: 80 },
+  ];
+
+  return (
+    <div className={cn("w-full p-6")}>
+      <div className="flex flex-col justify-between gap-4 mb-4">
+        <h2 className="text-md font-bold mb-2">Zakladne informacie</h2>
+        <div className="mt-3">
+          <Form fields={fields}>
+            {({ fields }) => (
+              <div>
+                <div className="flex gap-4">
+                  <div className="flex-1">{fields["gender"]}</div>
+                  <div className="flex-1">{fields["age"]}</div>
+                </div>
+              </div>
+            )}
+          </Form>
+        </div>
+        <div>
+          {data &&
+            Object.keys(data).map((key) => (
+              <div key={key}>
+                <h2 className="text-md font-bold my-2">
+                  {categories[key as keyof typeof categories]}
+                </h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  {data[key]?.map((question) => (
+                    <Popover key={question.id}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-8">
+                          {question.title}
+                          <ChevronDown className="ml-1 h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-3">
+                        <div className="space-y-2">
+                          {question.questionChoices.map((choice) => (
+                            <div key={choice.id} className="flex items-center">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                  "justify-start w-full font-normal",
+                                  filters?.[
+                                    "question-" + question.id
+                                  ]?.includes(choice.id) && "font-medium"
+                                )}
+                                onClick={() =>
+                                  toggleFilter(
+                                    question.id.toString(),
+                                    choice.id
+                                  )
+                                }
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  {choice.title}
+                                  {filters?.[question.id]?.includes(
+                                    choice.id
+                                  ) && <Check className="h-4 w-4" />}
+                                </div>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ))}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+      <ActiveFilterBadges />
+    </div>
+  );
+}
