@@ -1,3 +1,4 @@
+// https://shadcnui-expansions.typeart.cc/docs/dual-range-slider
 "use client";
 import React from "react";
 import { DualRangeSlider } from "@/components/range";
@@ -39,7 +40,7 @@ export default function Range({
       min={min}
       max={max}
       step={1}
-      labelPosition="bottom"
+      labelPosition="top"
       className={className}
       //{...field}
     />
@@ -51,8 +52,8 @@ export default function Range({
 
   return (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
-      <FormControl className="block">{Element}</FormControl>
+      <FormLabel className="mb-6">{label}</FormLabel>
+      <FormControl className="block ml-2">{Element}</FormControl>
       <FormMessage />
     </FormItem>
   );

@@ -48,7 +48,7 @@ const models = [
   //{ name: "post", table: "post", entity: 'Post', optionField: 'title' },
   //{ name: "media", table: "media", entity: 'Media', optionField: 'name' },
   //{ name: "run", table: "run", entity: 'Run', optionField: 'title' },
-  { name: "event", table: "event", entity: "Event", optionField: "name" },
+  //{ name: "event", table: "event", entity: "Event", optionField: "name" },
   {
     name: "eventType",
     table: "eventType",

@@ -77,7 +77,7 @@ interface FormProps<T> {
   fields: FormField_[];
   validation?: Rules;
   data?: DefaultFormData;
-  action?: (data: T) => Promise<ActionResult>;
+  action?: (data: T, form: UseFormReturn) => Promise<ActionResult>;
   buttons?: ((props: Partial<FormState<DefaultFormData>>) => JSX.Element)[];
   render?: FormRender;
   children?: FormRender;
@@ -115,8 +115,8 @@ export default function Form_<T = DefaultFormData>({
     if (!action) return;
 
     try {
-      const response = await action(data);
-      form.reset();
+      const response = await action(data, form);
+      //form.reset();
       if (!response) {
         return;
       }

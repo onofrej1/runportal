@@ -2,6 +2,7 @@ import { Pagination, OrderBy, SearchParam } from "@/services";
 import { prisma } from "@/db/prisma";
 import { Event } from "@/generated/prisma";
 import { applyFilters } from "@/lib/resources-filter";
+import { arrayToQuery } from "@/lib/resources";
 
 export const eventService = {
   getAll: async (
@@ -31,6 +32,7 @@ export const eventService = {
       skip: offset,
       orderBy: orderByQuery,
       where,
+      include: arrayToQuery(["eventType"]),
     });
 
     return [data, pageCount];
@@ -39,6 +41,7 @@ export const eventService = {
   get: async (id: number) => {
     return await prisma.event.findFirst({
       where: { id: Number(id) },
+      include: arrayToQuery(["eventType"]),
     });
   },
 

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Resource } from "@/types/resources";
 import { CreateEvent } from "@/validation";
-import { Event } from "@/generated/prisma";
+import { Event, EventType } from "@/generated/prisma";
 import Link from "next/link";
 import { Image as ImageIcon, SquarePen } from "lucide-react";
 
@@ -79,6 +79,15 @@ const event: Resource = {
       render: ({ row }) => (
         <span>
           {new Date((row.original as Event).endDate).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      name: "eventType",
+      header: "Event type",
+      render: ({ row }) => (
+        <span>
+          {(row.original as Event & { eventType: EventType }).eventType.type}
         </span>
       ),
     },

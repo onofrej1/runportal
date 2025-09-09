@@ -12,6 +12,7 @@ const eventType: Resource = {
         { name: 'type', type: 'text', label: 'Type' },        
     ],
     list: [
+        { name: 'id', header: 'Id' },
         { name: 'type', header: 'Type' },
     ],
 };
