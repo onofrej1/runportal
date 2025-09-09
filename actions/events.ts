@@ -1,9 +1,6 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { Event, Venue } from "@prisma/client";
-import { getSession } from "./auth";
-import { Model, Action } from "@/types";
 
 export async function getEvents() {
   return prisma.event.findMany();
@@ -17,18 +14,6 @@ export async function getVenues() {
   return prisma.venue.findMany({ orderBy: { id: 'desc' }});
 }
 
-export async function createVenue(data: Venue) {
-  const session = await getSession();
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-  const venue = await prisma.venue.create({
-    data,
-  });
-  
-  return venue;
-}
-
 export async function getEvent(id: number) {
   return prisma.event.findFirstOrThrow({
     where: {
@@ -37,7 +22,7 @@ export async function getEvent(id: number) {
   });
 }
 
-export async function createEvent(data: Event) {
+/*export async function createEvent(data: Event) {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
@@ -80,4 +65,4 @@ export async function updateEvent(data: Event) {
     }
   });
   return event;
-}
+}*/

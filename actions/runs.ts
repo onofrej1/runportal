@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { Registration } from "@prisma/client";
+import { Registration } from "@/generated/prisma";
 
 export async function getRuns() {
   return prisma.run.findMany({

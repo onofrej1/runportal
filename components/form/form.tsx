@@ -116,6 +116,7 @@ export default function Form_<T = DefaultFormData>({
 
     try {
       const response = await action(data);
+      form.reset();
       if (!response) {
         return;
       }
@@ -166,6 +167,7 @@ export default function Form_<T = DefaultFormData>({
                 field={field}
                 label={label}
                 className={className}
+                placeholder={formField.placeholder}
                 rows={formField.rows}
               />
             )}

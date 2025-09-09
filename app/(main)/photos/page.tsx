@@ -1,9 +1,6 @@
 "use client";
-import {
-  addPhotos,
-  deleteFile,
-  deletePhotos,
-  getUserPhotos,
+import {  
+  deleteFile,  
   uploadFiles,
 } from "@/actions/files";
 import MediaUploader from "@/components/mediaUploader";
@@ -55,38 +52,9 @@ export default function PhotosPage() {
     setFiles(selectedFiles);
   };
 
-  const [lightboxDisplay, setLightBoxDisplay] = useState(false);
-  const [imageToShow, setImageToShow] = useState<UserPhoto>();
-
   const showImage = (image: UserPhoto) => {
-    setImageToShow(image);
-    setLightBoxDisplay(true);
-  };
-
-  const hideLightBox = () => {
-    setLightBoxDisplay(false);
-  };
-
-  const showNext = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation();
-    const currentIndex = images.findIndex((e) => e.id === imageToShow?.id);
-    if (currentIndex >= images.length - 1) {
-      setImageToShow(images[0]);
-    } else {
-      const nextImage = images[currentIndex + 1];
-      setImageToShow(nextImage);
-    }
-  };
-
-  const showPrev = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation();
-    const currentIndex = images.findIndex((e) => e.id === imageToShow?.id);
-    if (currentIndex <= 0) {
-      setImageToShow(images[images.length - 1]);
-    } else {
-      const nextImage = images[currentIndex - 1];
-      setImageToShow(nextImage);
-    }
+    //setImageToShow(image);
+    //setLightBoxDisplay(true);
   };
 
   const upload = async () => {

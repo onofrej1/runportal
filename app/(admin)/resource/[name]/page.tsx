@@ -29,7 +29,6 @@ export default function Resource() {
     joinOperator: operator = 'and',
     filters,
   } = Object.fromEntries(searchParams.entries());
-  console.log(filters);
 
   const baseFilters: Filter[] = [];
   if (!advancedFilter) {

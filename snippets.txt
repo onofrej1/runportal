@@ -1,0 +1,154 @@
+<div className="img-gallery">
+          {images.slice(25, 40).map((i) => (
+            <div key={i.id} className="img-gallery__item">
+              <figure>
+                <img
+                  src={i.file}
+                  className="max-w-full h-auto"
+                  alt="Image #1"
+                />
+                <figcaption>Image #1</figcaption>
+              </figure>
+            </div>
+          ))}
+        </div>
+        <div className="my-grid grid-cols-5">
+          {images.slice(0, 20).map((i) => (
+            <div className="img-download" key={i.id}>
+              <img src={i.file} className="aspect-3/2" alt="gallery-photo" />
+              <a
+                href="https://loremflickr.com/320/240/dog"
+                download="dog.jpg"
+                className="flex items-center p-2"
+              >
+                <Download /> Download
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="h-[300px]">content</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          {[...Array(4).keys()].map((i) => (
+            <div key={i} className="grid gap-4">
+              {[...Array(4).keys()].map((j) => (
+                <div key={j} className="group overflow-hidden">
+                  <img
+                    className="h-autoxxx h-full max-w-full rounded-lg object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    src={imgs[i * 3 + j]?.file}
+                    alt={imgs[i * 3 + j]?.file}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="container1 mb-10 mt-8">
+          {images.slice(26, 45).map((image) => {
+            return (
+              <div
+                key={image.id}
+                //href={image.file}
+                //target="_blank"
+                className={image.orientation?.toLowerCase()}
+              >
+                <img
+                  //onClick={() => showImage(image)}
+                  src={image.file}
+                  alt={image.name}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        .img-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  &::after {
+    content: "";
+    flex-grow: 999;
+    flex-shrink: 1;
+    flex-basis: auto;
+  }
+}
+
+.img-gallery__item {
+  position: relative;
+  flex: auto;
+  overflow: hidden;
+  height: 300px;
+  border-radius: var(--gallery-item-border-radius);
+
+  img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Gallery styles */
+:root {
+  --gallery-item-border-radius: 0.4em;
+  --gallery-caption-bg-color: hsl(0 0% 0% / 90%);
+  --gallery-caption-text-color: white;
+}
+
+.img-gallery__item {
+  figure {
+    margin: 0;
+    height: 100%;
+  }
+
+  figcaption {
+    position: absolute;
+    inset: auto auto 0 0;
+
+    width: 100%;
+    padding: 1rem;
+
+    color: var(--gallery-caption-text-color);
+    background-color: var(--gallery-caption-bg-color);
+
+    transition: opacity 0.25s ease-in-out;
+    opacity: 0;
+  }
+
+  &:hover {
+    figcaption {
+      opacity: 1;
+    }
+  }
+}
+
+
+<img
+                className="img cursor-pointer hover:contrast-200 transition-transform duration-300 hover:scale-110"
+                src={media.file}
+                loading="lazy"
+                //fill={true}
+                //objectFit="cover"
+                alt=""
+              />
+
+              .mosaic-gallery {
+  display: flex;
+  flex-wrap: wrap;
+
+  li {
+    flex: auto;
+    height: 15vw;
+    margin: 0 0.5rem 1rem;
+    max-height: 20rem;
+    overflow: hidden;
+    /*position: relative;
+    aspect-ratio: 3/2;*/
+
+    img {
+      
+      width: 100%;
+      object-fit: cover;
+      height: 100%;
+    }
+  }
+}

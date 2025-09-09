@@ -84,7 +84,7 @@ export const Navbar = () => {
                   </Link>
                   <Link
                     href="/signup"
-                    className="ml-4 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                    className="ml-4 bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
                   >
                     Sign Up
                   </Link>

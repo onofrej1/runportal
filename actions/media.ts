@@ -1,23 +1,13 @@
 "use server";
 
-import { prisma } from "@/db/prisma";
+import { mediaService } from "@/services/media";
 
-export async function getMedia(galleryId: number) {
-  const data = await prisma.media.findMany({
-    /*where: {
-        galleryId,
-    },*/
-    include: {
-      user: {
-        select: {
-          firstName: true,
-          lastName: true,
-        },
-      },
-      mediaType: true,
-      comments: true,
-    },
-  });
+export async function getMedia(galleryId: number, offset: number) {
+  const [data, count] = await mediaService.getAll(
+    { limit: 10, offset },
+    { filters: [], operator: "and" },
+    [{ id: "id", desc: true }]
+  );
 
-  return data;
+  return [data, count] as const;
 }

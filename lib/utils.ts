@@ -42,7 +42,7 @@ export function formatDate(date: string | Date, dateFormat?: string) {
   return new Date(date).toLocaleDateString();
 }
 
-export function random(list: unknown[]) {
+export function random<T>(list: T[]) {
   return list[Math.floor(Math.random() * list.length)];
 }
 

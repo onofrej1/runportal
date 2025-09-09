@@ -1,8 +1,9 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { PostStatus } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { PostStatus } from "@/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function toggleEnableComments(
   id: number,
@@ -18,13 +19,47 @@ export async function toggleEnableComments(
   });
 }
 
-export async function getAllPosts(skip: number) {
-  //const { take, skip, sort, include, joinOperator = 'AND', filters } =   
+export async function getPostById(id: number) {
+  const data = await prisma.post.findFirstOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      author: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+      tags: true,
+      categories: true,
+      comments: {
+        orderBy: {
+          createdAt: "asc",
+        },
+        include: {
+          user: true /*{
+            select: {
+              name: true,
+              image: true,
+            },
+          },*/,
+          _count: {
+            select: {
+              comments: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return data;
+}
+
+export async function getPosts(skip = 0) {
   const take = 10;
-  //const orderBy = getOrderBy(sort);
   const where = {};
-  //const whereQuery = getWhereQuery(filters);
-  //const where = whereQuery.length ? { [joinOperator.toUpperCase()]: whereQuery } : {};
 
   const data = await prisma.post.findMany({
     take: Number(take),
@@ -33,7 +68,9 @@ export async function getAllPosts(skip: number) {
       author: true,
       comments: true,
     },
-    //orderBy,
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
   const count = await prisma.post.count({
@@ -42,25 +79,9 @@ export async function getAllPosts(skip: number) {
   const numPages = Math.ceil(count / Number(take));
 
   return { data, count, numPages };
-  /*const data = await prisma.post.findMany({
-    include: {
-      author: {
-        select: {
-          firstName: true,
-          lastName: true,
-        },
-      },
-      comments: true,
-    },
-  });
-
-  return data;*/
 }
 
-export async function updateStatus(
-  id: number,
-  status: PostStatus
-) {
+export async function updateStatus(id: number, status: PostStatus) {
   return prisma.post.update({
     where: {
       id,
@@ -69,4 +90,64 @@ export async function updateStatus(
       status,
     },
   });
+}
+
+export async function getComments(parentId: number) {
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+  if (!session?.user.id) return;
+
+  const result = await prisma.comment.findMany({
+    where: {
+      parentId,
+    },
+    select: {
+      id: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+      comment: true,
+      publishedAt: true,
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+  return result;
+}
+
+export async function addComment(
+  comment: string,
+  postId: number | null,
+  parentId?: number | null
+) {
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+  if (!session?.user.id) return;
+
+  if (postId) {
+    return prisma.comment.create({
+      data: {
+        userId: session.user.id,
+        postId,
+        comment,
+      },
+    });
+  } else if (parentId) {
+    return prisma.comment.create({
+      data: {
+        userId: session.user.id,
+        parentId,
+        comment,
+      },
+    });
+  }
 }

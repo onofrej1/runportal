@@ -23,8 +23,8 @@ model Question {
 
   questionChoices QuestionChoice[]
 
-  eventInfo            EventInfo[]
-  userPreferences      UserPreferences[]
+  eventInfo       EventInfo[]
+  userPreferences UserPreferences[]
 }
 
 model QuestionChoice {
@@ -34,14 +34,14 @@ model QuestionChoice {
   question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   displayOrder Int
 
-  eventInfo        EventInfo[]
-  userPreferences  UserPreferences[]
+  eventInfo       EventInfo[]
+  userPreferences UserPreferences[]
 }
 
 model EventInfo {
   id               Int             @id @default(autoincrement())
-  eventId           Int
-  event             Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId          Int
+  event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   questionId       Int
   question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionChoiceId Int?
@@ -98,21 +98,21 @@ model User {
   banReason  String?
   banExpires DateTime?
 
+  posts            Post[]
+  comments         Comment[]
+  likes            Like[]
+  media            Media[]
+  galleries        Gallery[]
+  mediaComments    MediaComment[]
+  events           Event[]
+  eventAttachments EventAttachment[]
+  attendees        Attendee[]
+  registrations    Registration[]
+  runResults       RunResult[]
+  userPreferences  UserPreferences[]
+
   @@unique([email])
   @@map("user")
-  
-  posts Post[]
-  comments Comment[]
-  likes Like[]
-  media Media[]
-  galleries Gallery[]
-  mediaComments MediaComment[]
-  events Event[]
-  eventAttachments EventAttachment[]
-  attendees Attendee[]
-  registrations Registration[]
-  runResults RunResult[]
-  userPreferences UserPreferences[]
 }
 
 model Post {
@@ -128,14 +128,14 @@ model Post {
   status          PostStatus @default(DRAFT)
   publishedAt     DateTime?
   metaTitle       String?
-  views           Int @default(0)
+  views           Int        @default(0)
   metaDescription String?
   author          User       @relation(fields: [authorId], references: [id])
   authorId        String
   categories      Category[]
   tags            Tag[]
   comments        Comment[]
-  likes           Like[]  
+  likes           Like[]
   galleries       Gallery[]
   // published       Boolean   @default(false)
   // metaKeywords String?
@@ -150,6 +150,7 @@ model Comment {
   id          Int           @id @default(autoincrement())
   comment     String        @db.Text
   status      CommentStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
   publishedAt DateTime      @default(now())
   editedAt    DateTime?
   user        User          @relation(fields: [userId], references: [id])
@@ -371,6 +372,7 @@ model Registration {
   firstName   String
   lastName    String
   gender      Gender
+  category    String?
   dateOfBirth DateTime
   email       String
   nation      String

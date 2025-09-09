@@ -28,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <div className="mx-auto">
         <div className="p-4 flex gap-6 mx-auto max-w-7xl">
-          <div className="relative self-start flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96">
+          {/*<div className="relative self-start flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96">
             <div className="mx-3 mb-0 border-b border-slate-200 pt-3 pb-2 px-1">
               <h5 className="items-center flex gap-3 mb-2 text-slate-800 text-xl font-semibold">
                 <Avatar>
@@ -50,11 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Upload /> Moje registracie
                 </H3>
               </Link>
-              {/*<Link href="/users">
-                <H3 className="flex gap-3 items-center">
-                  <Search /> 
-                </H3>
-              </Link>*/}
+              
               <Link href="/signout">
                 <H3 className="flex gap-3 items-center">
                   <LogOut color="#000000" /> Odhlasit
@@ -62,7 +58,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </div>
             <p className="text-slate-600 leading-normal font-light"></p>
-          </div>
+          </div>*/}
 
           <div className="flex-1 mt-6">{children}</div>
         </div>

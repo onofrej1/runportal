@@ -1,8 +1,9 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { Registration } from "@prisma/client";
-import { getSession } from "./auth";
+import { Registration } from "@/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function getRegistrations() {
   return prisma.registration.findMany({
@@ -60,10 +61,12 @@ export async function getRegistrationsByRunId(runId: number) {
 }
 
 export async function updateRegistration(data: Partial<Registration>) {
-  const session = await getSession();
-  if (!session) {
-    //throw new Error("Unauthorized");
-  }
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+  if (!session?.user.id) return;
+  
   await prisma.registration.update({
     where: {
       id: data.id,
@@ -73,10 +76,12 @@ export async function updateRegistration(data: Partial<Registration>) {
 }
 
 export async function createRegistration(data: Registration) {
-  const session = await getSession();
-  if (!session) {
-    //throw new Error("Unauthorized");
-  }
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+  if (!session?.user.id) return;
+
   await prisma.registration.create({
     data: {
       city: data.city,
