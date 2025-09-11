@@ -1,20 +1,34 @@
 import { prisma } from "@/db/prisma";
 // { District } from "@/generated/prisma";
 import { NextResponse } from "next/server";
-const cities = await import("./cities.json");
+const citiesJson = await import("./cities.json");
 
 export async function GET() {
   await prisma.location.deleteMany();
   await prisma.district.deleteMany();
   await prisma.region.deleteMany();
 
+  const cities = citiesJson.default;
+
   console.log("cities", cities);
   //const districts: Partial<District>[] = [];
+
+  const codes = {    
+      "Košický": "KE",
+      "Bratislavský": "BA",
+      "Banskobystrický kraj": "BB",
+       "Prešovský": "PO",
+       "Nitriansky": "NR",
+       "Trenčiansky kraj": "TC",
+      "Trnavský kraj": "TV",
+      "Žilinský kraj": "ZA",    
+  }
   
   for (const region of Object.keys(cities)) {
     await prisma.region.create({
       data: {
         region,
+        code: codes[region as keyof typeof codes],
       },
     });
     const newRegion = await prisma.region.findFirstOrThrow({
@@ -22,7 +36,7 @@ export async function GET() {
         region,
       },
     });
-
+    console.log('region', region);
     for (const district of Object.keys(cities[region as keyof typeof cities])) {
       await prisma.district.create({
         data: {
@@ -38,7 +52,7 @@ export async function GET() {
       });
 
       const regionData = cities[region as keyof typeof cities];
-      console.log('district', district);
+      //console.log('district', district);
       //console.log(regionData[district]);
       for (const location of regionData[district as keyof typeof regionData] as string[]) {
         //console.log('loc', location);

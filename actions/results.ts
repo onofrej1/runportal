@@ -26,6 +26,14 @@ export async function getResultsByRunId(runId: number) {
   });
 }
 
+export async function getRegistrations(runId: number) {
+  return prisma.registration.findMany({
+    where: {
+      runId,
+    },
+  });
+}
+
 export async function createResults(data: RunResult[]) {
   const validateResult = CreateRunResult.parse(data);
   

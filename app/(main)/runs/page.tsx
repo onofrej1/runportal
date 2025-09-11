@@ -1,15 +1,12 @@
 "use client";
-import { getRuns } from "@/actions/runs";
+import { getRegionOptions, getRuns } from "@/actions/runs";
 import Form from "@/components/form/form";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
-import { formatDate, random } from "@/lib/utils";
 import { FormField } from "@/types/resources";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowRight,
   Info,
-  LocateIcon,
   MapPin,
   Mountain,
   RulerDimensionLine,
@@ -17,13 +14,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useCallback, useMemo, useRef } from "react";
-import { UseFormReturn } from "react-hook-form";
 
 export default function Events() {
   const { data } = useSession();
   console.log(data);
 
-  const filter = useRef<{ dateFrom?: string; dateTo?: string }>({});
+  const filter = useRef<{
+    dateFrom?: string;
+    dateTo?: string;
+    region?: string[];
+  }>({});
 
   const {
     data: runs = [],
@@ -34,37 +34,77 @@ export default function Events() {
     queryFn: () => getRuns(filter.current),
   });
 
-  const fields: FormField[] = useMemo(() => ([
-    //{ name: "name", type: "text", label: "Nazov podujatia" },
-    {
-      name: "eventType",
-      type: "multiple-select",
-      label: "Typ sportu",
-      options: [
-        { value: "1", label: "Beh" },
-        { value: "2", label: "Beh so psom" },
-        { value: "3", label: "Nordic walking" },
-        { value: "4", label: "Cyklistika" },
-      ],
-    },
-    { name: "dateFrom", type: "date-picker", label: "Datum od" },
-    { name: "dateTo", type: "date-picker", label: "Datum do" },
-    { name: "locality", type: "text", label: "Lokalita" },
-    { name: "distance", type: "range", min: 0, max: 100, label: "Dlzka trate" },
-    { name: "elevation", type: "range", min: 0, max: 2000, label: "Prevysenie" },
-  ]), []);
+  console.log(runs);
 
-  const sendForm = useCallback(async (data: any) => {
-    console.log("data", data);
-    if (data.eventType && data.eventType.length > 0) {
-      data.eventType = data.eventType.map((option: any) => option.value);
-    } else {
-      data.eventType = undefined;
-    }
-    filter.current = data;
-    refetch();
-    return {};
-  }, [refetch]);
+  const {
+    data: regions = [],
+    //isLoading: isRegionsLoading,
+  } = useQuery({
+    queryKey: ["getRegions"],
+    queryFn: () => getRegionOptions(),
+  });
+
+  const fields: FormField[] = useMemo(
+    () => [
+      //{ name: "name", type: "text", label: "Nazov podujatia" },
+      {
+        name: "region",
+        type: "multiple-select",
+        label: "Kraj",
+        options: regions,
+      },
+      {
+        name: "eventType",
+        type: "multiple-select",
+        label: "Typ sportu",
+        options: [
+          { value: "1", label: "Beh" },
+          { value: "2", label: "Beh so psom" },
+          { value: "3", label: "Nordic walking" },
+          { value: "4", label: "Cyklistika" },
+        ],
+      },
+      { name: "dateFrom", type: "date-picker", label: "Datum od" },
+      { name: "dateTo", type: "date-picker", label: "Datum do" },
+      { name: "locality", type: "text", label: "Lokalita" },
+      {
+        name: "distance",
+        type: "range",
+        min: 0,
+        max: 100,
+        label: "Dlzka trate",
+      },
+      {
+        name: "elevation",
+        type: "range",
+        min: 0,
+        max: 2000,
+        label: "Prevysenie",
+      },
+    ],
+    [regions]
+  );
+
+  const sendForm = useCallback(
+    async (data: any) => {
+      console.log("data", data);
+      if (data.eventType && data.eventType.length > 0) {
+        data.eventType = data.eventType.map((option: any) => option.value);
+      } else {
+        data.eventType = undefined;
+      }
+
+      if (data.region && data.region.length > 0) {
+        data.region = data.region.map((option: any) => option.value);
+      } else {
+        data.region = undefined;
+      }
+      filter.current = data;
+      refetch();
+      return {};
+    },
+    [refetch]
+  );
 
   const CalIcon = (date: Date) => {
     const monthNames = [
@@ -110,14 +150,14 @@ export default function Events() {
     );
   };
 
-  const MemoForm = useMemo(
-    () => {
-      console.log('rerender form');
-      return (
+  const MemoForm = useMemo(() => {
+    console.log("rerender form");
+    return (
       <Form fields={fields} action={sendForm}>
         {({ fields }) => (
           <div>
             <div className="flex flex-col gap-3 pb-4">
+              {fields.region}
               {fields.eventType}
               <div className="flex gap-2">
                 <div className="flex-1">{fields.dateFrom}</div>
@@ -132,9 +172,8 @@ export default function Events() {
           </div>
         )}
       </Form>
-    )},
-    [fields, sendForm]
-  );
+    );
+  }, [fields, sendForm]);
 
   if (isLoading) return;
   console.log(runs);
@@ -149,7 +188,7 @@ export default function Events() {
             </h5>
             {MemoForm}
           </div>
-          
+
           <div className="mt-2 max-w-sm p-6 border-t-green-700 border-t-4 bg-white border border-gray-200 rounded-lg shadow-sm">
             <h5 className="mb-2 text-xl font-bold dark:text-white">
               Odber noviniek
@@ -220,7 +259,8 @@ export default function Events() {
                   <div className="flex gap-2 items-center">
                     <MapPin size={16} color="#000000" />
                     <span className="overflow-ellipsis whitespace-nowrap overflow-hidden">
-                      {run.event.location}
+                      {run.event.location?.location}{' '}
+                      ({run.event.location?.district.region.region})
                     </span>
                   </div>
                 </div>

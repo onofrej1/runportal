@@ -16,24 +16,10 @@ export const auth = betterAuth({
       /*nickname: {
         type: "string",
         required: false,        
-      },*/
-      details: {
-        type: "string",
-        required: false,
-        defaultValue: "",
-      },
-      popularity: {
-        type: "number",
-        required: false,
-        defaultValue: 0,
-      },
+      },*/      
       gender: {
         type: "string",
         required: true,
-      },
-      genderSearch: {
-        type: "string",
-        required: false,
       },
       dob: {
         type: "date",

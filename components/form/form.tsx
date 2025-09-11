@@ -151,6 +151,7 @@ export default function Form_<T = DefaultFormData>({
               <FormInput
                 field={field}
                 label={label}
+                placeholder={formField.placeholder}
                 className={className}
                 type={type}
               />
@@ -228,7 +229,7 @@ export default function Form_<T = DefaultFormData>({
               name={name}
               render={({ field }) => (
                 <>
-                  <DatePicker label={label} field={field} />
+                  <DatePicker label={label} field={field} className={className} />
                 </>
               )}
             />

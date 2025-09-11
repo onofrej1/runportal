@@ -2,7 +2,6 @@
 
 import { prisma } from "@/db/prisma";
 import { Registration } from "@/generated/prisma";
-import { eventType } from "@/resources/eventType";
 
 type SearchParams = {
   dateFrom?: string;
@@ -10,11 +9,12 @@ type SearchParams = {
   distance?: number[];
   elevation?: number[];
   eventType?: string[];
+  region?: string[];
 };
 
 export async function getRuns(search: SearchParams) {
-  const { dateFrom, dateTo, distance, elevation, eventType } = search;
-  console.log('e', eventType);
+  const { dateFrom, dateTo, distance, elevation, eventType, region } = search;
+
   return prisma.run.findMany({
     where: {
       event: {
@@ -26,38 +26,55 @@ export async function getRuns(search: SearchParams) {
         },
         eventType: {
           id: {
-            in: eventType ? eventType.map(e => Number(e)) : undefined,
-          }
-        }
+            in: eventType ? eventType.map((e) => Number(e)) : undefined,
+          },
+        },
+        location: {
+          district: {
+            region: {
+              id: {
+                in: region ? region.map((e) => Number(e)) : undefined,
+              },
+            },
+          },
+        },
       },
-      
       distance: {
         gt: distance ? distance[0] * 1000 : undefined,
-        lt: distance ? distance[1] * 1000 : undefined
+        lt: distance ? distance[1] * 1000 : undefined,
       },
       elevation: {
         gt: elevation ? elevation[0] : undefined,
-        lt: elevation ? elevation[1] : undefined
+        lt: elevation ? elevation[1] : undefined,
       },
     },
-    include: {      
+    include: {
       event: {
         select: {
           startDate: true,
           endDate: true,
-          location: true,
+          location: {
+            select: {
+              location: true,
+              district: {
+                select: {
+                  region: true,
+                },
+              },
+            },
+          },
           createdAt: true,
           name: true,
           eventType: true,
-        }
-      },      
+        },
+      },
       _count: {
         select: {
-            registrations: true,
-            runResults: true,
-        }
-      }
-    },    
+          registrations: true,
+          runResults: true,
+        },
+      },
+    },
   });
 }
 
@@ -66,7 +83,64 @@ export async function getRunById(id: number) {
     where: {
       id,
     },
+    include: {
+      event: {
+        select: {
+          startDate: true,
+          endDate: true,
+          contact: true,
+          name: true,
+          organizer: true,
+          
+          location: {
+            select: {
+              location: true,
+              district: {
+                select: {
+                  region: true,
+                }
+              }
+            }
+          }
+        }
+      },
+      _count: {
+        select: {
+          registrations: true,
+          runResults: true,
+        }
+      }
+    }
   });
+}
+
+export async function getRegionOptions() {
+  const models = await prisma.region.findMany();
+
+  return models.map((model) => ({
+    value: model.id,
+    label: model.region,
+  }));
+}
+
+export async function getCategoryOptions(runId: number) {
+  const models = await prisma.runCategory.findMany({
+    where: {
+      runs: {
+        some: {
+          id: {
+            in: [runId]
+          }
+        }
+      }
+    }
+  });
+  console.log(models.length);
+
+  return models.map((model) => ({
+    value: model.id.toString(),
+    label: model.title,
+  }));
 }
 
 export async function createRegistration(data: Registration) {

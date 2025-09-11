@@ -1,138 +1,153 @@
 "use client";
 import { getRunById } from "@/actions/runs";
 //import FileUploader from "@/components/fileUploader";
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { hmsToSeconds, parseCsv } from "@/lib/utils";
-import { createResults } from "@/actions/results";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import UploadDialog from "@/components/uploadDialog";
-import { H3 } from "@/components/typography";
 
-type CsvData = {
-  rank: number;
-  bib: number;
-  name: string;
-  category: string;
-  club: string;
-  time: number;
-  timeHms: string;
-  gender: string;
-  runId: number;
-  yearOfBirth: number;
-};
+//import { H1, H2, H3 } from "@/components/typography";
+import { ExternalLink, MapPin, Mountain, RulerDimensionLine, TreePine } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function Run() {
   const { id } = useParams();
-  const [uploadData, setUploadData] = useState<CsvData[]>();
   const { data: run, isFetching } = useQuery({
     queryKey: ["getRunById"],
     queryFn: () => getRunById(Number(id)),
   });
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   if (isFetching || !run) return;
 
-  const fileUpload = (files: File[]) => {
-    //const { file } = data;
-    const file = files[0];
-    console.log(file);
-    const formData = new FormData();
-    formData.append("myFile", file, file.name);
-    const formObject = Object.fromEntries(formData.entries());
-    const reader = new FileReader();
-
-    reader.onload = function (e: any) {
-      const content = e.target.result;
-      const requiredHeaders = [
-        "rank",
-        "bib",
-        "name",
-        "category",
-        "time",
-        "club",
-        "gender",
-        "yearOfBirth",
-      ];
-      const csvData = parseCsv(content, requiredHeaders);
-      setUploadData(csvData);
-      setIsUploadDialogOpen(false);
-    };
-    reader.readAsText(formObject["myFile"] as Blob);
-  };
-
-  /*const headers = [
-    { name: "name", header: "Name" },
-    { name: "time", header: "Time" },
-    { name: "rank", header: "Rank" },
-  ];*/
-
-  const saveResults = () => {
-    if (uploadData && uploadData?.length > 0) {
-      const data: CsvData = uploadData.map((data) => {
-        data.runId = Number(id);
-        data.time = hmsToSeconds(data.timeHms);
-        return data;
-      });
-      createResults(data);
-    }
-  };
-
-  console.log(uploadData);
-
   return (
-    <div>
-      Run {run.title} {run.distance} km Upload results
-      {/*<FileUploader onChange={fileUpload} />*/}
-      <Button onClick={() => setIsUploadDialogOpen(true)}>
-        Upload results
-      </Button>
-      <UploadDialog
-        onChange={fileUpload}
-        isOpen={isUploadDialogOpen}
-        onOpenChange={setIsUploadDialogOpen}
-      />
-      <H3>Upload data</H3>
-      {uploadData && uploadData.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Poradie</TableHead>
-              <TableHead>Št. číslo</TableHead>
-              <TableHead>Categória</TableHead>
-              <TableHead>Meno</TableHead>
-              <TableHead>Rok nar.</TableHead>
-              <TableHead>Klub</TableHead>
-              <TableHead>Pohlavie</TableHead>
-              <TableHead>Čas</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {uploadData.map((data) => (
-              <TableRow key={data.rank}>
-                <TableCell>{data.rank}</TableCell>
-                <TableCell>{data.bib}</TableCell>
-                <TableCell>{data.category}</TableCell>
-                <TableCell>{data.name}</TableCell>
-                <TableCell>{data.yearOfBirth}</TableCell>
-                <TableCell>{data.club}</TableCell>
-                <TableCell>{data.gender}</TableCell>
-                <TableCell>{data.timeHms}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-      <Button onClick={saveResults}>Save results</Button>
-    </div>
+    <Card className="flex mb-6 p-0 border-t-green-700 border-t-4">
+      <CardContent className="flex pr-0">
+        <div className="max-w-3xl p-6 flex-1">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+            Coastal Marathon
+          </h1>
+          <p className="mt-2 text-base text-slate-500">
+            San Francisco, CA · Saturday, August 12, 2023
+          </p>
+         
+          <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-slate-200 py-6 sm:grid-cols-2">
+            <div className="flex gap-3 items-center">
+              <RulerDimensionLine size={16} color="#000000" />
+              <div>
+                <div className="text-sm text-slate-500">Vzdialenost</div>
+                <span className="text-lg font-bold text-slate-800">
+                  {Number((run.distance / 1000).toFixed(1))}Km
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 items-center">
+              <Mountain size={16} color="#000000" />
+              <div>
+                <div className="text-sm text-slate-500">Prevysenie</div>
+                <span className="text-lg font-bold text-slate-800">
+                  {run.elevation}m
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 items-center">
+              <TreePine size={16} color="#000000" />
+              <div>
+                <div className="text-sm text-slate-500">Povrch</div>
+                <span className="text-lg font-bold text-slate-800">
+                  {run.surface}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 items-center">
+              <MapPin size={16} color="#000000" />
+              <div>
+                <div className="text-sm text-slate-500">Lokalita</div>
+                <span className="text-lg font-bold text-slate-800">
+                  {run.event.location?.location}
+                  {/*run.event.location?.district.region.region*/}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div>
+          <h3 className="mt-6 text-xl font-bold text-slate-800">
+              Kategorie
+            </h3>
+            <p>Kategorie su dostupne na stranke usporiadatela</p>
+            <h3 className="mt-6 text-xl font-bold text-slate-800">
+              Program behu
+            </h3>
+            <p>Informacie su dostupne na stranke usporiadatela</p>
+            <div className="mt-2 flex gap-1">
+              <Button size={'lg'}>Propozicie</Button>
+              <Button size={'lg'}>Registracia
+                <ExternalLink />
+              </Button>
+            </div>
+            {/*<h3 className="mt-6 text-xl font-bold text-slate-800">Pravidla</h3>
+            <p>
+              Preteká sa podľa pravidiel atletických súťaží atletického zväzu
+            </p>
+
+            <h3 className="mt-6 text-xl font-bold text-slate-800">Poistenie</h3>
+            <p>
+              Všetci účastníci sú povinní zabezpečiť si individuálne zdravotné
+              poistenie (postačujúce je štandardné všeobecné zdravotné
+              poistenie, kryté niektorou z poisťovní). Organizátor nepreberá
+              zodpovednosť za škody na majetku alebo na zdraví súvisiace s
+              cestou, pobytom a s účasťou pretekárov na podujatí.Každý účastník
+              štartuje na vlastnú zodpovednosť a zodpovedá za svoj zdravotný
+              stav v akom nastupuje na štart a zúčastňuje sa podujatia.
+            </p>
+            {/*<div className="mt-4 border-t border-slate-200">
+              <dl className="divide-y divide-slate-200">
+                <div className="grid grid-cols-3 gap-4 px-0 py-4">
+                  <dt className="text-sm font-medium text-slate-500">
+                    6:00 AM - 7:30 AM
+                  </dt>
+                  <dd className="col-span-2 mt-0 text-sm text-slate-900">
+                    Packet Pickup &amp; Registration
+                  </dd>
+                </div>
+                <div className="grid grid-cols-3 gap-4 px-0 py-4">
+                  <dt className="text-sm font-medium text-slate-500">
+                    8:00 AM
+                  </dt>
+                  <dd className="col-span-2 mt-0 text-sm text-slate-900">
+                    Race Start
+                  </dd>
+                </div>
+                <div className="grid grid-cols-3 gap-4 px-0 py-4">
+                  <dt className="text-sm font-medium text-slate-500">
+                    8:00 AM
+                  </dt>
+                  <dd className="col-span-2 mt-0 text-sm text-slate-900">
+                    Vyhodnotenie
+                  </dd>
+                </div>
+              </dl>
+            </div>*/}
+            {/*<h3 className="mt-6 mb-3 text-xl font-bold text-slate-800">
+              Odkaz na podujatie
+            </h3>
+            <p>Prejst na stranku s podujatim</p>*/}
+          </div>
+        </div>
+
+        {/*<div className="flex-1">
+          <Image
+            src="/images/test.jpg"
+            width={500}
+            height={500}
+            className="object-contain w-full h-full rounded-r-md"
+            alt=""
+          />
+        </div>*/}
+      </CardContent>
+    </Card>
   );
 }

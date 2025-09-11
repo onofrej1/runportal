@@ -276,8 +276,8 @@ model Event {
   updatedAt      DateTime          @updatedAt
   createdBy      User              @relation(fields: [createdById], references: [id])
   createdById    String
-  venue          Venue?            @relation(fields: [venueId], references: [id])
-  venueId        Int?
+  location       Location?         @relation(fields: [locationId], references: [id])
+  locationId     Int?
   eventSchedules EventSchedule[]
   attendees      Attendee[]
   organizer      Organizer?        @relation(fields: [organizerId], references: [id])
@@ -314,23 +314,16 @@ model Organizer {
   events Event[]
 }
 
-model Venue {
-  id         Int      @id @default(autoincrement())  
-  location   Location @relation(fields: [locationId], references: [id])
-  locationId Int
-  events     Event[]
-}
-
 model Location {
-  id         Int          @id @default(autoincrement())
+  id         Int           @id @default(autoincrement())
   location   String
   place      String?
   lat        String?
   lot        String?
-  district   District     @relation(fields: [districtId], references: [id])
+  district   District      @relation(fields: [districtId], references: [id])
   districtId Int
   type       LocationType?
-  venues     Venue[]
+  events     Event[]
 }
 
 model District {

@@ -1,5 +1,5 @@
 "use client";
-import { getResultsByRunId } from "@/actions/results";
+import { getRegistrations } from "@/actions/results";
 import React from "react";
 import {
   Table,
@@ -16,17 +16,17 @@ import { getCategoryOptions } from "@/actions/runs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Form from "@/components/form/form";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Check } from "lucide-react";
 
 export default function Results() {
   const params = useParams();
 
   const {
-    data: results = [],
+    data = [],
     //isLoading: isRegionsLoading,
   } = useQuery({
     queryKey: ["getResultsByRunId"],
-    queryFn: () => getResultsByRunId(Number(params.id)),
+    queryFn: () => getRegistrations(Number(params.id)),
   });
 
   const {
@@ -51,15 +51,21 @@ export default function Results() {
   ];
 
   const fields: FormField[] = [
-    { name: "search", type: "text", className: "w-full" },
     {
-      name: "gender",
+      name: "search",
+      type: "text",
+      className: "w-md",
+      placeholder: "Hladaj meno ...",
+    },
+    {
+      name: "paid",
       type: "select",
-      placeholder: "Pohlavie",
+      placeholder: "Platba",
       className: "w-auto",
       options: [
-        { label: "Man", value: "MALE" },
-        { label: "Woman", value: "FEMALE" },
+        { label: "All statuses", value: "all" },
+        { label: "Zaplatene", value: "yes" },
+        { label: "Nezaplatene", value: "no" },
       ],
     },
     {
@@ -67,9 +73,15 @@ export default function Results() {
       type: "select",
       placeholder: "Kategoria",
       className: "w-auto",
-      options: categories,
+      options: categories.concat([{ label: "All categories", value: "all" }]),
     },
-  ];
+  ].map(
+    (f) =>
+      ({
+        ...f,
+        className: f.className + " !h-[40px]",
+      } as FormField)
+  );
 
   return (
     <Card className=" bg-white p-6 border-t-4 rounded-md border-t-green-700">
@@ -80,47 +92,32 @@ export default function Results() {
             Secovska desiatka
           </h2>
           <p className="mt-3 border-t border-gray-400 border-b mb-4 text-lg text-text-secondary">
-            Vysledky behu
+            Zoznam registrovanych bezcov
           </p>
         </div>
 
-        <ToggleGroup className="my-4" variant="outline" type="multiple">
-          <ToggleGroupItem
-            value="bold"
-            aria-label="Toggle bold"
-          >Muzi do 40r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="italic"
-            aria-label="Toggle italic"
-          >Muzi do 50r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="strikethrough"
-            aria-label="Toggle strikethrough"
-          >Zeny do 40r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="strikethrough"
-            aria-label="Toggle strikethrough"
-          >Zeny do 60r</ToggleGroupItem>
-        </ToggleGroup>
-
-        <Form
-          fields={fields}
-          //data={{ runId: Number(params.id) }}
-          //action={sendRegistration}
-        >
-          {({ fields }) => (
-            <div>
-              {/*<div className="flex gap-1">
-                <div className="flex-1 flex gap-3 items-center">
-                  <label>Search</label>
-                  {fields.search}
-                </div>
-                {fields.category}
-                {fields.gender}
-              </div>*/}
-            </div>
-          )}
-        </Form>
+        <div className="my-5 borderxx border-dashed border-gray-400 p-5x">
+          <Form
+            fields={fields}
+            data={{ category: 'all', paid: 'all' }}
+            //data={{ runId: Number(params.id) }}
+            //action={sendRegistration}
+          >
+            {({ fields }) => (
+              <div>
+                {
+                  <div className="flex gap-1">
+                    <div className="flex-1 flex gap-3 items-center">
+                      {fields.search}
+                    </div>
+                    {fields.category}
+                    {fields.paid}
+                  </div>
+                }
+              </div>
+            )}
+          </Form>
+        </div>
 
         <Table>
           <TableHeader>
@@ -133,19 +130,21 @@ export default function Results() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {results.map((result) => (
-              <TableRow key={result.id}>
-                <TableCell className="font-medium">{result.rank}</TableCell>
-                <TableCell className="font-medium">{result.category}</TableCell>
+            {data.map((reg) => (
+              <TableRow key={reg.id}>
+                <TableCell className="font-medium"></TableCell>
+                <TableCell className="font-medium">{reg.category}</TableCell>
                 {/*<TableCell className="font-medium">{result.bib}</TableCell>*/}
-                <TableCell className="font-medium">{result.name}</TableCell>
                 <TableCell className="font-medium">
-                  {result.yearOfBirth}
+                  {reg.lastName} {reg.firstName}
                 </TableCell>
-                <TableCell className="font-medium">{result.club}</TableCell>
-                <TableCell className="font-medium">{result.gender}</TableCell>
                 <TableCell className="font-medium">
-                  {new Date(result.time * 1000).toISOString().slice(11, 19)}
+                  {reg.dateOfBirth.getFullYear()}
+                </TableCell>
+                <TableCell className="font-medium">{reg.club}</TableCell>
+                <TableCell className="font-medium">{reg.gender}</TableCell>
+                <TableCell className="font-medium">
+                  {reg.paid ? <Check /> : <Check />}
                 </TableCell>
               </TableRow>
             ))}

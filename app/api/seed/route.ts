@@ -9,7 +9,6 @@ import {
   EventSchedule,
   EventType,
   Organizer,
-  Venue,
   Run,
   RunCategory,
   RunResult,
@@ -29,9 +28,8 @@ function random<T>(list: T[]) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-export async function GET() {
-  await prisma.user.deleteMany();
-  await prisma.question.deleteMany();
+export async function GET() {  
+  /*await prisma.question.deleteMany();
   await prisma.questionChoice.deleteMany();
   await prisma.category.deleteMany();
   await prisma.tag.deleteMany();
@@ -44,7 +42,7 @@ export async function GET() {
   await prisma.eventSchedule.deleteMany();
   await prisma.attendee.deleteMany();
   await prisma.organizer.deleteMany();
-  await prisma.venue.deleteMany();
+  await prisma.location.deleteMany();
 
   await prisma.runResult.deleteMany();
   await prisma.registration.deleteMany();
@@ -55,12 +53,12 @@ export async function GET() {
   await prisma.mediaCategory.deleteMany();
   await prisma.mediaType.deleteMany();
   await prisma.mediaComment.deleteMany();
+  await prisma.user.deleteMany();*/
 
   const count = Array.from({ length: 5 });
   const categories: Partial<Category>[] = [];
   const tags: Partial<Tag>[] = [];
   const organizers: Partial<Organizer>[] = [];
-  const venues: Partial<Venue>[] = [];
   const mediaCategories: Partial<MediaCategory>[] = [];
   const mediaTypes: Partial<MediaType>[] = [];
 
@@ -79,9 +77,7 @@ export async function GET() {
       name: faker.person.firstName(),
       email: "admin@example.com",
       password: process.env.TEST_USER_PASSWORD!,
-      popularity: 0,
       gender: "man",
-      genderSearch: "woman",
       dob: random(dateOfBirth),
       bio: faker.person.bio(),
       image: "",
@@ -96,7 +92,6 @@ export async function GET() {
         name: faker.person.firstName(),
         email: faker.person.lastName().toLocaleLowerCase() + "@example.com",
         password: process.env.TEST_USER_PASSWORD!,
-        popularity: 0,
         gender,        
         dob: random(dateOfBirth),
         bio: faker.person.bio(),
@@ -142,16 +137,11 @@ export async function GET() {
     organizers.push({
       name: faker.lorem.word(),
     });
-
-    venues.push({
-      location: faker.lorem.word(),
-    });
   }
 
   await prisma.category.createMany({ data: categories as Category[] });
   await prisma.tag.createMany({ data: tags as Tag[] });
   await prisma.organizer.createMany({ data: organizers as Organizer[] });
-  await prisma.venue.createMany({ data: venues as Venue[] });
   await prisma.mediaCategory.createMany({
     data: mediaCategories as MediaCategory[],
   });
@@ -179,6 +169,9 @@ export async function GET() {
       type: "Running kemp",
     }
   );
+
+  const locations = await prisma.location.findMany();
+  const locationIds = locations.map(location => location.id);
 
   for (const [index] of count.entries()) {
     const i = index + 1;
@@ -212,14 +205,13 @@ export async function GET() {
       name: faker.lorem.words({ min: 2, max: 3 }),
       description: faker.lorem.sentences(),
       color: faker.internet.color(),
-      location: faker.location.street() + " " + faker.location.city(),
       maxAttendees: faker.number.int({ min: 1, max: 9 }),
       contact: faker.person.fullName(),
       createdById: random(userIds),
       startDate,
       endDate,
       organizerId: i % 2 === 0 ? i : null,
-      venueId: i % 2 === 0 ? i : null,
+      locationId: random(locationIds),
       status: "Created",
       eventTypeId: random([1, 2]),
     });
