@@ -369,21 +369,22 @@ model EventSchedule {
 }
 
 model Run {
-  id            Int            @id @default(autoincrement())
-  title         String
-  distance      Int
-  elevation     Int?
-  surface       String?
-  maxAttendees  Int?
-  tshirt        Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  event         Event          @relation(fields: [eventId], references: [id])
-  eventId       Int
-  registrations Registration[]
-  runResults    RunResult[]
-  runCategories RunCategory[]
-  runEntryFees  RunEntryFee[]
+  id              Int            @id @default(autoincrement())
+  title           String
+  distance        Int
+  elevation       Int?
+  surface         String?
+  maxAttendees    Int?
+  tshirt          Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  registerEndDate DateTime
+  event           Event          @relation(fields: [eventId], references: [id])
+  eventId         Int
+  registrations   Registration[]
+  runResults      RunResult[]
+  runCategories   RunCategory[]
+  runEntryFees    RunEntryFee[]
 }
 
 model RunEntryFee {

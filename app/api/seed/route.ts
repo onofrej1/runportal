@@ -297,6 +297,8 @@ export async function GET() {
       title: faker.lorem.words({ min: 2, max: 3 }),
       distance: random([5000, 10000, 21097, 15000]),
       elevation: faker.number.int({ min: 10, max: 600 }),
+      registerEndDate: faker.date.future(),
+      maxAttendees: random([80, 120, 150, 200, 300]),
       //price: random([10, 15, 20, 25]),
       surface: random(["road", "grass"]),
       eventId: i,
