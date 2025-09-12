@@ -5,7 +5,7 @@ import { ManageRegistration } from "@/validation";
 
 const registration: Resource = {
   name: "Registration",
-  name_plural: "registrations",
+  name_plural: "Registrations",
   model: "registration",
   resource: "registrations",
   menuIcon: "",
@@ -13,27 +13,41 @@ const registration: Resource = {
   form: [
     { name: "firstName", type: "text", label: "First name" },
     { name: "lastName", type: "text", label: "Last name" },
-    { name: "gender", type: "select", label: "Gender", options: [
-        { value: 'MALE', label: 'Male'},
-        { value: 'FEMALE', label: 'Female'},
-    ]},
+    {
+      name: "gender",
+      type: "select",
+      label: "Gender",
+      options: [
+        { value: "MALE", label: "Male" },
+        { value: "FEMALE", label: "Female" },
+      ],
+    },
     { name: "dateOfBirth", type: "date-picker", label: "Date of birth" },
-    { name: "nation", type: "select", label: "Nation", options: [
-        { value: 'svk', label: 'SVK'},
-        { value: 'other', label: 'other'},
-    ]},
+    {
+      name: "nation",
+      type: "select",
+      label: "Nation",
+      options: [
+        { value: "svk", label: "SVK" },
+        { value: "other", label: "other" },
+      ],
+    },
     { name: "club", type: "text", label: "Club" },
     { name: "city", type: "text", label: "City" },
     { name: "email", type: "text", label: "Email" },
     { name: "presented", type: "checkbox", label: "Presented" },
     { name: "paid", type: "checkbox", label: "Paid" },
-    { name: "tshirtSize", type: "select", label: "Tshirt size", 
+    {
+      name: "tshirtSize",
+      type: "select",
+      label: "Tshirt size",
       options: [
-        { value: 'null', label: 'No Tshirt'},
-        { value: 'M', label: 'M'},
-        { value: 'L', label: 'L'},
-        { value: 'XL', label: 'XL'},
-    ]},    
+        { value: "null", label: "No Tshirt" },
+        { value: "M", label: "M" },
+        { value: "L", label: "L" },
+        { value: "XL", label: "XL" },
+      ],
+    },
     {
       name: "userId",
       type: "foreignKey",
@@ -67,17 +81,17 @@ const registration: Resource = {
       enableColumnFilter: true,
       filter: {
         label: "Run",
-        placeholder: "Search runs...",        
+        placeholder: "Search runs...",
         type: "multiSelect",
         name: "runId",
-        resource: "runs",        
+        resource: "runs",
         search: "run",
       },
       render: ({ row }) => {
-        const data = row.original as Registration & { run: Run };        
+        const data = row.original as Registration & { run: Run };
         return <span>{data.run.title}</span>;
       },
-    },    
+    },
   ],
 };
 export { registration };

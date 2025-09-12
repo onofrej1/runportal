@@ -1,9 +1,9 @@
 import { Filter, Resource } from "@/lib/resources";
 import { User } from "@/generated/prisma";
 //import { userService } from "./user-service";
-import { questionService } from "./question-service";
-import { questionChoiceService } from "./question-choice-service";
-import { venueService } from "./venue";
+//import { questionService } from "./question-service";
+//import { questionChoiceService } from "./question-choice-service";
+//import { venueService } from "./venue";
 import { organizerService } from "./organizer";
 import { postService } from "./post";
 import { categoryService } from "./category";
@@ -18,6 +18,7 @@ import { mediaCategoryService } from "./mediaCategory";
 import { mediaCommentService } from "./mediaComment";
 import { galleryService } from "./gallery";
 import { registrationService } from "./registration";
+import { runResultService } from "./runResult";
 
 export type Pagination = {
   limit: number;
@@ -51,11 +52,11 @@ export type UnionToIntersection<U> =
 
 type Service =  
   //| typeof userService
-  | typeof questionService
-  | typeof questionChoiceService
+  //| typeof questionService
+  //| typeof questionChoiceService
   | typeof organizerService
   | typeof postService
-  | typeof venueService
+  //| typeof venueService
   | typeof categoryService
   | typeof tagService
   | typeof eventService
@@ -66,6 +67,8 @@ type Service =
   | typeof mediaTypeService
   | typeof mediaCommentService
   | typeof runService
+  | typeof registrationService
+  | typeof runResultService
   | typeof galleryService;
 
 const services = new Map<Resource, Service>([
@@ -86,7 +89,8 @@ const services = new Map<Resource, Service>([
   ["mediaCategories", mediaCategoryService],
   ["mediaComments", mediaCommentService],
   ['galleries', galleryService],
-  ['registrations', registrationService]
+  ['registrations', registrationService],
+  ['runResults', runResultService]
 ]);
 
 export function getDataService(resource: Resource) {

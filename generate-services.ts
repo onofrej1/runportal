@@ -49,6 +49,8 @@ const models = [
   //{ name: "media", table: "media", entity: 'Media', optionField: 'name' },
   //{ name: "run", table: "run", entity: 'Run', optionField: 'title' },
   //{ name: "event", table: "event", entity: "Event", optionField: "name" },
+  //{ name: "registration", table: "registration", entity: "Registration", optionField: "name" },
+  //{ name: "gallery", table: "gallery", entity: "Gallery", optionField: "name" },
   {
     name: "eventType",
     table: "eventType",
@@ -70,12 +72,7 @@ const models = [
   },
   { name: "tag", entity: "Tag", table: "tag", optionField: "title" },
   { name: "user", entity: "User", table: "user", optionField: "name" },
-  {
-    name: "registration",
-    table: "registration",
-    entity: "Registration",
-    optionField: "name",
-  },
+  
   {
     name: "comment",
     table: "comment",
@@ -98,19 +95,19 @@ const models = [
     name: "mediaType",
     table: "mediaType",
     entity: "MediaType",
-    optionField: "title",
+    optionField: "name",
   },
   {
     name: "mediaComment",
     table: "mediaComment",
     entity: "MediaComment",
-    optionField: "title",
-  },
+    optionField: "comment",
+  },  
   {
-    name: "gallery",
-    table: "gallery",
-    entity: "Gallery",
-    optionField: "title",
+    name: "runResult",
+    table: "runResult",
+    entity: "RunResult",
+    optionField: "name",
   },
 ];
 for (const model of [...models /*, ...defaultModels*/]) {

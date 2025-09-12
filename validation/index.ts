@@ -1,3 +1,4 @@
+import { category } from "@/resources/category";
 import { z } from "zod";
 
 const many2many = z
@@ -126,11 +127,11 @@ export const CreateRegistration = z.object({
   id: z.number().optional(),
   firstName: z.string('Prosim zadajte "Meno"'),
   lastName: z.string('Prosim zadajte "Priezvisko"'),
-  dateOfBirth: z.coerce.date('Zadajte datum narodenia'),
-  gender: z.enum(["MALE", "FEMALE"], 'Vyberte pohlavie'),
-  categoryId: z.coerce.number('Prosim vyberte kategoriu'),
-  email: z.email('Zadajte email'),
-  runId: z.coerce.number('Vyberte beh'),
+  dateOfBirth: z.coerce.date("Zadajte datum narodenia"),
+  gender: z.enum(["MALE", "FEMALE"], "Vyberte pohlavie"),
+  categoryId: z.coerce.number("Prosim vyberte kategoriu"),
+  email: z.email("Zadajte email"),
+  runId: z.coerce.number("Vyberte beh"),
   nation: z.string('Prosim zadajte "Narodnost"'),
   city: z.string().optional(),
   club: z.string('Prosim zadajte "Klub"'),
@@ -141,22 +142,39 @@ export const ManageRegistration = z.object({
   id: z.number().optional(),
   firstName: z.string('Prosim zadajte "Meno"'),
   lastName: z.string('Prosim zadajte "Priezvisko"'),
-  dateOfBirth: z.coerce.date('Zadajte datum narodenia'),
-  gender: z.enum(["MALE", "FEMALE"], 'Vyberte pohlavie'),
-  categoryId: z.coerce.number('Prosim vyberte kategoriu'),
+  dateOfBirth: z.coerce.date("Zadajte datum narodenia"),
+  gender: z.enum(["MALE", "FEMALE"], "Vyberte pohlavie"),
+  categoryId: z.coerce.number("Prosim vyberte kategoriu"),
   userId: z.string().nullable(),
   runId: z.coerce.number(),
-  email: z.email('Zadajte email'),  
+  email: z.email("Zadajte email"),
   nation: z.string('Prosim zadajte "Narodnost"'),
   city: z.string().optional(),
   paid: z.boolean(),
   presented: z.boolean(),
-  tshirtSize: z.string().transform(value => {
-    if (value === 'null') return null;
-    return value;
-  }).nullable(),
+  tshirtSize: z
+    .string()
+    .transform((value) => {
+      if (value === "null") return null;
+      return value;
+    })
+    .nullable(),
   club: z.string('Prosim zadajte "Klub"'),
   //phone: z.coerce.number('Zadajte telefonne cislo'),
+});
+
+export const ManageResults = z.object({
+  id: z.number().optional(),
+  rank: numberValue,
+  bib: z.coerce.string(),
+  name: stringValue,
+  category: stringValue,
+  time: numberValue, //stringValue,
+  gender: z.enum(["MALE", "FEMALE"]),  
+  club: stringValue,
+  yearOfBirth: numberValue,
+  userId: z.string().nullable(),
+  runId: numberValue,
 });
 
 export const CreateRunResult = z.array(
@@ -165,11 +183,11 @@ export const CreateRunResult = z.array(
     name: stringValue,
     club: stringValue,
     category: stringValue,
-    bib: numberValue,
+    bib: z.coerce.string(),
     rank: numberValue,
     time: numberValue,
     gender: z.enum(["MALE", "FEMALE"]),
-    yearOfBirth: numberValue,
+    yearOfBirth: numberValue,    
     runId: numberValue,
   })
 );

@@ -16,6 +16,7 @@ import { mediaType } from "./mediaType";
 import { gallery } from "./gallery";
 import { eventType } from "./eventType";
 import { registration } from "./registration";
+import { runResult } from "./runResult";
 
 const resources: Resource[] = [
   registration,
@@ -34,7 +35,8 @@ const resources: Resource[] = [
   media,
   mediaComment,
   mediaType,
-  mediaCategory
+  mediaCategory,
+  runResult
 ];
 
 export { resources };

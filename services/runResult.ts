@@ -1,14 +1,15 @@
 import { Pagination, OrderBy, SearchParam } from "@/services";
 import { prisma } from "@/db/prisma";
-import { MediaComment } from "@/generated/prisma";
+import { RunResult } from "@/generated/prisma";
 import { applyFilters } from "@/lib/resources-filter";
+import { arrayToQuery } from "@/lib/resources";
 
-export const mediaCommentService = {
+export const runResultService = {
   getAll: async (
     pagination: Pagination,
     search: SearchParam,
     orderBy: OrderBy[]
-  ): Promise<[MediaComment[], number]> => {
+  ): Promise<[RunResult[], number]> => {
     const { limit, offset } = pagination;
     const { filters, operator } = search;
 
@@ -17,7 +18,7 @@ export const mediaCommentService = {
     });
 
     const where = applyFilters(filters, operator);
-    const rowCount = await prisma.mediaComment.aggregate({
+    const rowCount = await prisma.runResult.aggregate({
       where,
       _count: {
         id: true,
@@ -26,40 +27,42 @@ export const mediaCommentService = {
 
     const pageCount = Math.ceil(rowCount._count.id / Number(limit));
 
-    const data = await prisma.mediaComment.findMany({
+    const data = await prisma.runResult.findMany({
       take: limit,
       skip: offset,
       orderBy: orderByQuery,
       where,
+      include: arrayToQuery(["run", "user"]),
     });
 
     return [data, pageCount];
   },
 
   get: async (id: number) => {
-    return await prisma.mediaComment.findFirst({
+    return await prisma.runResult.findFirst({
       where: { id: Number(id) },
+      include: arrayToQuery(["run", "user"]),
     });
   },
 
-  create: async (data: MediaComment) => {
-    await prisma.mediaComment.create({ data });
+  create: async (data: RunResult) => {
+    await prisma.runResult.create({ data });
   },
 
-  update: async (data: MediaComment) => {
-    await prisma.mediaComment.update({ where: { id: data.id }, data });
+  update: async (data: RunResult) => {
+    await prisma.runResult.update({ where: { id: data.id }, data });
   },
 
   delete: async (id: number[]) => {
-    await prisma.mediaComment.deleteMany({ where: { id: { in: id } } });
+    await prisma.runResult.deleteMany({ where: { id: { in: id } } });
   },
 
   getOptions: async () => {
-    const models = await prisma.mediaComment.findMany();
+    const models = await prisma.runResult.findMany();
 
     return models.map((model) => ({
       value: model.id,
-      label: model.comment,
+      label: model.name,
     }));
   },
 };
