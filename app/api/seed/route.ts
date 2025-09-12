@@ -396,6 +396,10 @@ export async function GET() {
       }
     );
   }
+
+  await prisma.runEntryFee.createMany({
+    data: runEntryFees as RunEntryFee[],
+  });
   
   await prisma.gallery.createMany({
     data: galleries as Gallery[],

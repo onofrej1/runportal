@@ -86,6 +86,7 @@ export async function getRunById(id: number) {
       id,
     },
     include: {
+      runEntryFees: true,
       event: {
         select: {
           startDate: true,

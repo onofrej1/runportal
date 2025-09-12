@@ -6,10 +6,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 //import { H1, H2, H3 } from "@/components/typography";
-import { ExternalLink, MapPin, Mountain, RulerDimensionLine, TreePine } from "lucide-react";
+import {
+  ExternalLink,
+  MapPin,
+  Mountain,
+  RulerDimensionLine,
+  TreePine,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
+//import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export default function Run() {
   const { id } = useParams();
@@ -17,7 +25,7 @@ export default function Run() {
     queryKey: ["getRunById"],
     queryFn: () => getRunById(Number(id)),
   });
-
+  console.log(run);
   if (isFetching || !run) return;
 
   return (
@@ -30,7 +38,7 @@ export default function Run() {
           <p className="mt-2 text-base text-slate-500">
             San Francisco, CA · Saturday, August 12, 2023
           </p>
-         
+
           <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-slate-200 py-6 sm:grid-cols-2">
             <div className="flex gap-3 items-center">
               <RulerDimensionLine size={16} color="#000000" />
@@ -74,17 +82,23 @@ export default function Run() {
             </div>
           </div>
           <div>
-          <h3 className="mt-6 text-xl font-bold text-slate-800">
-              Kategorie
+            <h3 className="mt-6 text-xl font-bold text-slate-800">
+              Startovne
             </h3>
+            <ul className="space-y-0.5">
+              {run.runEntryFees.map(entryFee => <li key={entryFee.id}>
+                Registracia do <span className="font-bold">{formatDate(entryFee.registerDate, 'dd.MM.yyyy')}</span> - <Badge variant={'outline'} className="font-bold">{entryFee.entryFee},- EUR</Badge></li>)}
+            </ul>
+            <h3 className="mt-6 text-xl font-bold text-slate-800">Kategorie</h3>
             <p>Kategorie su dostupne na stranke usporiadatela</p>
             <h3 className="mt-6 text-xl font-bold text-slate-800">
               Program behu
             </h3>
             <p>Informacie su dostupne na stranke usporiadatela</p>
             <div className="mt-2 flex gap-1">
-              <Button size={'lg'}>Propozicie</Button>
-              <Button size={'lg'}>Registracia
+              <Button size={"lg"}>Propozicie</Button>
+              <Button size={"lg"}>
+                Registracia
                 <ExternalLink />
               </Button>
             </div>

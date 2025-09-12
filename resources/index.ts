@@ -15,8 +15,10 @@ import { media } from "./media";
 import { mediaType } from "./mediaType";
 import { gallery } from "./gallery";
 import { eventType } from "./eventType";
+import { registration } from "./registration";
 
 const resources: Resource[] = [
+  registration,
   post,
   category,
   event,

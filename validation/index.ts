@@ -107,10 +107,10 @@ export const CreateOrganizer = z.object({
   name: stringValue,
 });
 
-export const CreateVenue = z.object({
+/*export const CreateVenue = z.object({
   id: idValue,
   location: stringValue,
-});
+});*/
 
 export const CreateRun = z.object({
   id: idValue,
@@ -133,6 +133,28 @@ export const CreateRegistration = z.object({
   runId: z.coerce.number('Vyberte beh'),
   nation: z.string('Prosim zadajte "Narodnost"'),
   city: z.string().optional(),
+  club: z.string('Prosim zadajte "Klub"'),
+  //phone: z.coerce.number('Zadajte telefonne cislo'),
+});
+
+export const ManageRegistration = z.object({
+  id: z.number().optional(),
+  firstName: z.string('Prosim zadajte "Meno"'),
+  lastName: z.string('Prosim zadajte "Priezvisko"'),
+  dateOfBirth: z.coerce.date('Zadajte datum narodenia'),
+  gender: z.enum(["MALE", "FEMALE"], 'Vyberte pohlavie'),
+  categoryId: z.coerce.number('Prosim vyberte kategoriu'),
+  userId: z.string().nullable(),
+  runId: z.coerce.number(),
+  email: z.email('Zadajte email'),  
+  nation: z.string('Prosim zadajte "Narodnost"'),
+  city: z.string().optional(),
+  paid: z.boolean(),
+  presented: z.boolean(),
+  tshirtSize: z.string().transform(value => {
+    if (value === 'null') return null;
+    return value;
+  }).nullable(),
   club: z.string('Prosim zadajte "Klub"'),
   //phone: z.coerce.number('Zadajte telefonne cislo'),
 });
@@ -229,7 +251,7 @@ export const ContactForm = z.object({
   message: stringValue,
 });
 
-export const CreateQuestion = z.object({
+/*export const CreateQuestion = z.object({
   id: idValue,
   question: stringValue,
   questionType: stringValue,
@@ -240,7 +262,7 @@ export const CreateQuestionChoice = z.object({
   title: stringValue,
   displayOrder: numberValue,
   questionId: numberValue,
-});
+});*/
 
 export type Rules =
   | typeof RegisterUser
@@ -249,9 +271,9 @@ export type Rules =
   | typeof ResetPasswordRequest
   | typeof ContactForm
   | typeof ResetPassword
-  | typeof CreateQuestion
-  | typeof CreateQuestionChoice
-  | typeof CreateVenue
+  //| typeof CreateQuestion
+  //| typeof CreateQuestionChoice
+  //| typeof CreateVenue
   | typeof CreateRun
   | typeof CreateEvent
   | typeof CreateOrganizer

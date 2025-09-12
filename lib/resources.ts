@@ -3,14 +3,14 @@ import { FilterOperator, FilterVariant } from "@/types/data-table";
 import { FormField } from "@/types/resources";
 
 export const resources = {  
-  questions: prisma.question,
-  questionChoices: prisma.questionChoice,
+  //questions: prisma.question,
+  //questionChoices: prisma.questionChoice,
   posts: prisma.post,
   tags: prisma.tag,
   runs: prisma.run,
   runResult: prisma.runResult,
   runCategories: prisma.runCategory,
-  venues: prisma.venue,
+  //venues: prisma.venue,  
   organizers: prisma.organizer,
   categories: prisma.category,
   events: prisma.event,
@@ -21,6 +21,8 @@ export const resources = {
   mediaComments: prisma.mediaComment,
   mediaTypes: prisma.mediaType,
   galleries: prisma.gallery,
+  registrations: prisma.registration,
+  results: prisma.runResult,
 };
 
 export type Resource = keyof typeof resources | "users";

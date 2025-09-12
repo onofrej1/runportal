@@ -2,6 +2,7 @@ import { Pagination, OrderBy, SearchParam } from "@/services";
 import { prisma } from "@/db/prisma";
 import { Registration } from "@/generated/prisma";
 import { applyFilters } from "@/lib/resources-filter";
+import { arrayToQuery } from "@/lib/resources";
 
 export const registrationService = {
   getAll: async (
@@ -21,7 +22,7 @@ export const registrationService = {
       where,
       _count: {
         id: true,
-      },
+      },      
     });
 
     const pageCount = Math.ceil(rowCount._count.id / Number(limit));
@@ -31,6 +32,7 @@ export const registrationService = {
       skip: offset,
       orderBy: orderByQuery,
       where,
+      include: arrayToQuery(["run", "user"]),
     });
 
     return [data, pageCount];
@@ -39,6 +41,7 @@ export const registrationService = {
   get: async (id: number) => {
     return await prisma.registration.findFirst({
       where: { id: Number(id) },
+      include: arrayToQuery(["run", "user"]),
     });
   },
 
@@ -59,7 +62,7 @@ export const registrationService = {
 
     return models.map((model) => ({
       value: model.id,
-      label: model.name,
+      label: model.lastName+' '+model.firstName,
     }));
   },
 };
