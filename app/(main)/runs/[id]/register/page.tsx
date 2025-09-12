@@ -43,14 +43,14 @@ export default function Register() {
     { name: "nation", type: "text", label: "Narodnost" },
     { name: "club", type: "text", label: "Klub" },
     {
-      name: "category",
+      name: "categoryId",
       type: "select",
       label: "Kategoria",
       options: categories,
     },
     { name: "city", type: "text", label: "Mesto" },
     //{ name: "phone", type: "text", label: "Telefonne cislo" },
-    { name: "note", type: "textarea", label: "Poznamka (Nepovinne)", rows: 4 },
+    { name: "note", type: "textarea", label: "Poznamka (Nepovinne)", rows: 5 },
   ]
     .map(
       (f) =>
@@ -59,17 +59,11 @@ export default function Register() {
           className: "!h-[50px]",
         } as FormField)
     )
-    .concat([{ name: "confirm", type: "checkbox" }]);
-
-  const test = () => {
-    toast("Dakujeme za registraciu", {
-      description: "Sunday, December 03, 2023 at 9:00 AM",
-    });
-  };
+    .concat([{ name: "confirm", type: "checkbox" }]);  
 
   const sendRegistration = async (data: Registration) => {
     await createRegistration(data);
-    test();
+    toast("Prihlaska bola odoslana");
     return {};
   };
 
@@ -81,7 +75,7 @@ export default function Register() {
             <Image width={70} height={70} alt="" src="/images/runner.jpg" />{" "}
             Secovska desiatka
           </h2>
-          <p className="mt-3 mb-6 border-t border-gray-400 border-b mb-4 text-lg text-text-secondary">
+          <p className="mt-3 border-t border-gray-400 border-b mb-5 text-lg text-text-secondary">
             Prosim vyplnte nasledovny formular pre registraciu.
           </p>
         </div>
@@ -95,14 +89,16 @@ export default function Register() {
           {({ fields }) => (
             <div>
               <div className="flex flex-col gap-4 pb-4">
-                {fields.firstName}
-                {fields.lastName}
+              <div className="flex gap-3">
+                  <div className="flex-1">{fields.firstName}</div>
+                  <div className="flex-1">{fields.lastName}</div>
+                </div>
                 <div className="flex gap-3">
                   <div className="flex-1">{fields.gender}</div>
                   <div className="flex-1">{fields.dateOfBirth}</div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-1">{fields.category}</div>
+                  <div className="flex-1">{fields.categoryId}</div>
                   <div className="flex-1">{fields.nation}</div>
                 </div>
                 {fields.email}
@@ -110,7 +106,7 @@ export default function Register() {
                   <div className="flex-1">{fields.club}</div>
                   <div className="flex-1">{fields.city}</div>
                 </div>
-                {fields.phone}
+                {/*fields.phone*/}
                 {fields.note}
                 <div className="mt-3 flex items-start gap-3 text-lg">
                   {fields.confirm}

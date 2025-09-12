@@ -128,13 +128,13 @@ export const CreateRegistration = z.object({
   lastName: z.string('Prosim zadajte "Priezvisko"'),
   dateOfBirth: z.coerce.date('Zadajte datum narodenia'),
   gender: z.enum(["MALE", "FEMALE"], 'Vyberte pohlavie'),
-  category: z.string('Prosim vyberte kategoriu'),
+  categoryId: z.coerce.number('Prosim vyberte kategoriu'),
   email: z.email('Zadajte email'),
   runId: z.coerce.number('Vyberte beh'),
   nation: z.string('Prosim zadajte "Narodnost"'),
-  city: z.string('Prosim zadajte "Mesto"'),
+  city: z.string().optional(),
   club: z.string('Prosim zadajte "Klub"'),
-  phone: z.coerce.number('Zadajte telefonne cislo'),
+  //phone: z.coerce.number('Zadajte telefonne cislo'),
 });
 
 export const CreateRunResult = z.array(

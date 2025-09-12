@@ -12,7 +12,7 @@ import {
   Run,
   RunCategory,
   RunResult,
-  Attendee,
+  RunEntryFee,
   Registration,
   Like,
   MediaCategory,
@@ -154,24 +154,82 @@ export async function GET() {
   const events: Partial<Event>[] = [];
   const eventTypes: Partial<EventType>[] = [];
   const eventSchedules: Partial<EventSchedule>[] = [];
-  const attendees: Partial<Attendee>[] = [];
+  //const attendees: Partial<Attendee>[] = [];
   const galleries: Partial<Gallery>[] = [];
 
   const runs: Partial<Run>[] = [];
+  const runEntryFees: Partial<RunEntryFee>[] = [];
   const registrations: Partial<Registration>[] = [];
   const runResults: Partial<RunResult>[] = [];
 
-  eventTypes.push(
+  const runCategories: Partial<RunCategory>[] = [
     {
-      type: "Race",
+      category: "M",
+      title: "Muzi do 39 rokov",
     },
     {
-      type: "Running kemp",
+      category: "M40",
+      title: "Muzi do 49 rokov",
+    },
+    {
+      category: "M50",
+      title: "Muzi do 59 rokov",
+    },
+    {
+      category: "M60",
+      title: "Muzi nad 60 rokov",
+    },
+    {
+      category: "M70",
+      title: "Muzi nad 70 rokov",
+    },
+    {
+      category: "F",
+      title: "Zeny do 39 rokov",
+    },
+    {
+      category: "F40",
+      title: "Zeny nad 40 rokov",
+    },
+    {
+      category: "F50",
+      title: "Zeny nad 50 rokov",
+    },
+    {
+      category: "F60",
+      title: "Zeny nad 60 rokov",
+    },
+    {
+      category: "MJ",
+      title: "Muzi - do 18r",
+    },
+    {
+      category: "ZJ",
+      title: "Zeny do 18 rokov",
+    },
+  ];
+
+  await prisma.runCategory.createMany({
+    data: runCategories as RunCategory[],
+  });
+
+  eventTypes.push(
+    {
+      type: "Run",
+    },
+    {
+      type: "Run with dog",
+    },
+    {
+      type: "Nordic walking",
     }
   );
 
   const locations = await prisma.location.findMany();
   const locationIds = locations.map(location => location.id);
+
+  const runCategories_ = await prisma.runCategory.findMany();
+  const runCategoryIds = runCategories_.map(catgory => catgory.id);
 
   for (const [index] of count.entries()) {
     const i = index + 1;
@@ -205,7 +263,7 @@ export async function GET() {
       name: faker.lorem.words({ min: 2, max: 3 }),
       description: faker.lorem.sentences(),
       color: faker.internet.color(),
-      maxAttendees: faker.number.int({ min: 1, max: 9 }),
+      //maxAttendees: faker.number.int({ min: 1, max: 200 }),
       contact: faker.person.fullName(),
       createdById: random(userIds),
       startDate,
@@ -229,17 +287,17 @@ export async function GET() {
       eventId: i,
     });
 
-    attendees.push({
+    /*attendees.push({
       status: random(["PENDING", "YES", "MAYBE", "NO", "ATTENDED"]),
       eventId: random([1, 2, 3]),
       userId: random(userIds),
-    });
+    });*/
 
     runs.push({
       title: faker.lorem.words({ min: 2, max: 3 }),
       distance: random([5000, 10000, 21097, 15000]),
       elevation: faker.number.int({ min: 10, max: 600 }),
-      price: random([10, 15, 20, 25]),
+      //price: random([10, 15, 20, 25]),
       surface: random(["road", "grass"]),
       eventId: i,
       tshirt: i % 2 === 0 ? true : false,
@@ -275,6 +333,7 @@ export async function GET() {
       city: faker.location.city(),
       nation: faker.location.state(),
       club: random(clubs),
+      categoryId: random(runCategoryIds),
       paid: false,
       presented: false,
       runId,
@@ -283,7 +342,7 @@ export async function GET() {
 
     runResults.push({
       name: faker.person.fullName(),
-      category: random(["A", "B", "C", "D", "E", "F"]),
+      category: random(runCategories_.map(c => c.category)),
       club: random(clubs),
       bib: faker.number.int({ min: 50, max: 250 }),
       gender: random(["MALE", "FEMALE"]),
@@ -293,33 +352,6 @@ export async function GET() {
       time: 1200 + i * 5,
     });
   }
-
-  const runCategories: Partial<RunCategory>[] = [
-    {
-      category: "A",
-      title: "Muzi do 39 rokov",
-    },
-    {
-      category: "B",
-      title: "Muzi do 49 rokov",
-    },
-    {
-      category: "C",
-      title: "Muzi do 59 rokov",
-    },
-    {
-      category: "D",
-      title: "Muzi nad 60 rokov",
-    },
-    {
-      category: "F",
-      title: "Zeny do 39 rokov",
-    },
-    {
-      category: "G",
-      title: "Zeny nad 39 rokov",
-    },
-  ];
 
   await prisma.post.createMany({ data: posts as Post[] });
 
@@ -333,13 +365,36 @@ export async function GET() {
   await prisma.eventSchedule.createMany({
     data: eventSchedules as EventSchedule[],
   });
-  await prisma.attendee.createMany({
+  /*await prisma.attendee.createMany({
     data: attendees as Attendee[],
-  });
+  });*/
+
   await prisma.run.createMany({ data: runs as Run[] });
-  await prisma.runCategory.createMany({
-    data: runCategories as RunCategory[],
-  });
+  const runs_ = await prisma.run.findMany();
+
+  for (const run of runs_) {
+    runEntryFees.push(
+      {
+        entryFee: 20,
+        details: 'online',
+        registerDate: new Date('2025-08-02'),
+        runId: run.id,
+      },
+      {
+        entryFee: 25,
+        details: 'online',
+        registerDate: new Date('2025-08-25'),
+        runId: run.id,
+      },
+      {
+        entryFee: 30,
+        details: 'registracia na mieste',
+        registerDate: new Date('2025-09-05'),
+        runId: run.id,
+      }
+    );
+  }
+  
   await prisma.gallery.createMany({
     data: galleries as Gallery[],
   });

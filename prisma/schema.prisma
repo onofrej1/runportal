@@ -10,59 +10,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Question {
-  id            Int     @id @default(autoincrement())
-  name          String
-  title         String
-  text          String?
-  type          String
-  isRequired    Boolean @default(false)
-  allowMultiple Boolean @default(false)
-  category      String
-  order         Int     @default(0)
+/**
+ * model Question {
+ * id            Int     @id @default(autoincrement())
+ * name          String
+ * title         String
+ * text          String?
+ * type          String
+ * isRequired    Boolean @default(false)
+ * allowMultiple Boolean @default(false)
+ * category      String
+ * order         Int     @default(0)
+ * questionChoices QuestionChoice[]
+ * eventInfo       EventInfo[]
+ * userPreferences UserPreferences[]
+ * }
+ * model QuestionChoice {
+ * id           Int      @id @default(autoincrement())
+ * title        String
+ * questionId   Int
+ * question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+ * displayOrder Int
+ * eventInfo       EventInfo[]
+ * userPreferences UserPreferences[]
+ * }
+ * model EventInfo {
+ * id               Int             @id @default(autoincrement())
+ * eventId          Int
+ * event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+ * questionId       Int
+ * question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+ * questionChoiceId Int?
+ * questionChoice   QuestionChoice? @relation(fields: [questionChoiceId], references: [id], onDelete: Cascade)
+ * weight           Int             @default(0)
+ * value            String?
+ * //@@unique([userId, questionId], name: "questionIdentifier")
+ * }
+ */
 
-  questionChoices QuestionChoice[]
-
-  eventInfo       EventInfo[]
-  userPreferences UserPreferences[]
-}
-
-model QuestionChoice {
-  id           Int      @id @default(autoincrement())
-  title        String
-  questionId   Int
-  question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  displayOrder Int
-
-  eventInfo       EventInfo[]
-  userPreferences UserPreferences[]
-}
-
-model EventInfo {
-  id               Int             @id @default(autoincrement())
-  eventId          Int
-  event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  questionId       Int
-  question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionChoiceId Int?
-  questionChoice   QuestionChoice? @relation(fields: [questionChoiceId], references: [id], onDelete: Cascade)
-  weight           Int             @default(0)
-  value            String?
-
-  //@@unique([userId, questionId], name: "questionIdentifier")
-}
-
-model UserPreferences {
-  id               Int             @id @default(autoincrement())
-  userId           String
-  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questionId       Int
-  question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionChoiceId Int?
-  questionChoice   QuestionChoice? @relation(fields: [questionChoiceId], references: [id], onDelete: Cascade)
-  weight           Int             @default(0)
-  value            String?
-}
+/**
+ * model UserPreferences {
+ * id               Int             @id @default(autoincrement())
+ * userId           String
+ * user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * questionId       Int
+ * question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+ * questionChoiceId Int?
+ * questionChoice   QuestionChoice? @relation(fields: [questionChoiceId], references: [id], onDelete: Cascade)
+ * weight           Int             @default(0)
+ * value            String?
+ * }
+ */
 
 /**
  * enum Region {
@@ -106,10 +104,10 @@ model User {
   mediaComments    MediaComment[]
   events           Event[]
   eventAttachments EventAttachment[]
-  attendees        Attendee[]
+  //attendees        Attendee[]
   registrations    Registration[]
   runResults       RunResult[]
-  userPreferences  UserPreferences[]
+  //userPreferences  UserPreferences[]
 
   @@unique([email])
   @@map("user")
@@ -266,7 +264,7 @@ model Event {
   color          String?
   status         String?
   contact        String?
-  maxAttendees   Int?
+  //maxAttendees   Int?
   onlineLink     String?
   eventUrl       String?
   startDate      DateTime
@@ -279,7 +277,7 @@ model Event {
   location       Location?         @relation(fields: [locationId], references: [id])
   locationId     Int?
   eventSchedules EventSchedule[]
-  attendees      Attendee[]
+  //attendees      Attendee[]
   organizer      Organizer?        @relation(fields: [organizerId], references: [id])
   organizerId    Int?
   eventType      EventType         @relation(fields: [eventTypeId], references: [id])
@@ -287,7 +285,7 @@ model Event {
   runs           Run[]
   attachments    EventAttachment[]
   galleries      Gallery[]
-  eventInfo      EventInfo[]
+  //eventInfo      EventInfo[]
 }
 
 model EventType {
@@ -347,14 +345,16 @@ enum LocationType {
   VILLAGE
 }
 
-model Attendee {
-  id      Int     @id @default(autoincrement())
-  user    User    @relation(fields: [userId], references: [id])
-  userId  String
-  event   Event   @relation(fields: [eventId], references: [id])
-  eventId Int
-  status  String?
-}
+/**
+ * model Attendee {
+ * id      Int     @id @default(autoincrement())
+ * user    User    @relation(fields: [userId], references: [id])
+ * userId  String
+ * event   Event   @relation(fields: [eventId], references: [id])
+ * eventId Int
+ * status  String?
+ * }
+ */
 
 model EventSchedule {
   id        Int      @id @default(autoincrement())
@@ -372,9 +372,9 @@ model Run {
   id            Int            @id @default(autoincrement())
   title         String
   distance      Int
-  price         Int
   elevation     Int?
   surface       String?
+  maxAttendees  Int?
   tshirt        Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -383,34 +383,47 @@ model Run {
   registrations Registration[]
   runResults    RunResult[]
   runCategories RunCategory[]
+  runEntryFees  RunEntryFee[]
+}
+
+model RunEntryFee {
+  id           Int      @id @default(autoincrement())
+  registerDate DateTime
+  entryFee     Int
+  details      String?
+  run          Run      @relation(fields: [runId], references: [id])
+  runId        Int
 }
 
 model RunCategory {
-  id       Int    @id @default(autoincrement())
-  category String
-  title    String
-  runs     Run[]
+  id            Int            @id @default(autoincrement())
+  category      String
+  title         String
+  runs          Run[]
+  registrations Registration[]
 }
 
 model Registration {
-  id          Int         @id @default(autoincrement())
-  createdAt   DateTime    @default(now())
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
   firstName   String
   lastName    String
   gender      Gender
-  category    String?
+  //category    String?
+  category    RunCategory? @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
   dateOfBirth DateTime
   email       String
   nation      String
-  city        String
+  city        String?
   club        String?
   phone       String?
-  presented   Boolean     @default(false)
-  paid        Boolean     @default(false)
+  presented   Boolean      @default(false)
+  paid        Boolean      @default(false)
   tshirtSize  TshirtSize?
-  user        User?       @relation(fields: [userId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
   userId      String?
-  run         Run         @relation(fields: [runId], references: [id])
+  run         Run          @relation(fields: [runId], references: [id])
   runId       Int
 }
 

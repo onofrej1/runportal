@@ -20,7 +20,7 @@ export async function toggleEnableComments(
 }
 
 export async function getPostById(id: number) {
-  const data = await prisma.post.findFirstOrThrow({
+  const post = await prisma.post.findFirstOrThrow({
     where: {
       id,
     },
@@ -33,6 +33,13 @@ export async function getPostById(id: number) {
       },
       tags: true,
       categories: true,
+      galleries: {
+        select: {
+          name: true,
+          description: true,
+          media: true,
+        }
+      },
       comments: {
         orderBy: {
           createdAt: "asc",
@@ -53,8 +60,12 @@ export async function getPostById(id: number) {
       },
     },
   });
+  const images = post.galleries.flatMap(gallery => gallery.media.map(media => ({
+    src: media.file,
+    id: media.id,
+  })));
 
-  return data;
+  return { post, images };
 }
 
 export async function getPosts(skip = 0) {

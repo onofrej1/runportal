@@ -6,15 +6,28 @@ import { Clock9, Tag, User } from "lucide-react";
 import { useParams } from "next/navigation";
 import Comments from "./_components/comments";
 import useMinimalTiptapEditor from "@/components/minimal-tiptap/hooks/use-minimal-tiptap";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import "./gallery.css";
+import Lightbox from "@/components/lightbox";
+import { H3 } from "@/components/typography";
 
 export default function SingleBlog() {
   const { id } = useParams();
-  const { data: post, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["getPostById", id],
     queryFn: () => getPostById(Number(id)),
+    //initialData: { post: undefined, images: [] },
   });
+  const { post, images } = data || { post: undefined, images: []};
 
+  const [lightboxImage, setLightboxImage] = useState<{
+    id: number;
+    src: string;
+  }>();
+  //const { post = {}, images } = data;
+
+  //console.log(post);
   const editor = useMinimalTiptapEditor({
     immediatelyRender: false,
   });
@@ -25,7 +38,7 @@ export default function SingleBlog() {
       try {
         content = JSON.parse(post.content);
         editor?.commands.setContent(content);
-      } catch {}      
+      } catch {}
     }
   }, [editor?.commands, editor?.isEmpty, post]);
 
@@ -80,9 +93,34 @@ export default function SingleBlog() {
           </div>
           <hr />
           {editor && (
-            <div className="my-5" dangerouslySetInnerHTML={{ __html: editor?.getHTML() }} />
-          )}          
+            <div
+              className="my-5"
+              dangerouslySetInnerHTML={{ __html: editor?.getHTML() }}
+            />
+          )}
         </div>
+
+        <H3 className="mt-4 mb-3">Fotogaleria</H3>
+        <ul className="gallery mb-10">
+          {images.map((image) => (
+            <li key={image.id}>
+              <Image
+                onClick={() =>
+                  setLightboxImage({ id: image.id, src: image.src })
+                }
+                className="img cursor-pointer hover:contrast-200 transition-transform duration-300 hover:scale-110"
+                src={image.src}
+                width={500}
+                height={500}
+                alt={image.src}
+              />
+            </li>
+          ))}
+        </ul>
+
+        {lightboxImage && (
+          <Lightbox activeImage={lightboxImage} images={images} />
+        )}
       </div>
 
       <Comments

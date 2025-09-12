@@ -16,7 +16,8 @@ import { getCategoryOptions } from "@/actions/runs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Form from "@/components/form/form";
-import { Check } from "lucide-react";
+import { Check, SquareCheck } from "lucide-react";
+import { random } from "@/lib/utils";
 
 export default function Results() {
   const params = useParams();
@@ -41,13 +42,13 @@ export default function Results() {
 
   const headers = [
     { name: "rank", header: "Rank" },
-    { name: "category", header: "Category" },
+    { name: "categoryId", header: "Kategoria" },
     //{ name: "bib", header: "Bib" },
-    { name: "name", header: "Name" },
-    { name: "yearOfBirth", header: "Born" },
-    { name: "club", header: "Club" },
-    { name: "gender", header: "Gender" },
-    { name: "time", header: "Time" },
+    { name: "name", header: "Meno" },
+    { name: "yearOfBirth", header: "Rok nar." },
+    { name: "club", header: "Klub" },
+    { name: "gender", header: "Muz/zena" },
+    { name: "paid", header: "Platba" },
   ];
 
   const fields: FormField[] = [
@@ -133,7 +134,7 @@ export default function Results() {
             {data.map((reg) => (
               <TableRow key={reg.id}>
                 <TableCell className="font-medium"></TableCell>
-                <TableCell className="font-medium">{reg.category}</TableCell>
+                <TableCell className="font-medium">{reg.category?.category}</TableCell>
                 {/*<TableCell className="font-medium">{result.bib}</TableCell>*/}
                 <TableCell className="font-medium">
                   {reg.lastName} {reg.firstName}
@@ -143,8 +144,8 @@ export default function Results() {
                 </TableCell>
                 <TableCell className="font-medium">{reg.club}</TableCell>
                 <TableCell className="font-medium">{reg.gender}</TableCell>
-                <TableCell className="font-medium">
-                  {reg.paid ? <Check /> : <Check />}
+                <TableCell className="font-medium justify-center">
+                  {random([0, 1]) === 1 ? '[pending]' : <SquareCheck className="bg-green-700 text-white" />}
                 </TableCell>
               </TableRow>
             ))}

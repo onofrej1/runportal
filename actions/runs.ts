@@ -2,6 +2,8 @@
 
 import { prisma } from "@/db/prisma";
 import { Registration } from "@/generated/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 type SearchParams = {
   dateFrom?: string;
@@ -91,26 +93,26 @@ export async function getRunById(id: number) {
           contact: true,
           name: true,
           organizer: true,
-          
+
           location: {
             select: {
               location: true,
               district: {
                 select: {
                   region: true,
-                }
-              }
-            }
-          }
-        }
+                },
+              },
+            },
+          },
+        },
       },
       _count: {
         select: {
           registrations: true,
           runResults: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 }
 
@@ -129,11 +131,11 @@ export async function getCategoryOptions(runId: number) {
       runs: {
         some: {
           id: {
-            in: [runId]
-          }
-        }
-      }
-    }
+            in: [runId],
+          },
+        },
+      },
+    },
   });
   console.log(models.length);
 
@@ -144,8 +146,16 @@ export async function getCategoryOptions(runId: number) {
 }
 
 export async function createRegistration(data: Registration) {
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+
   const registration = prisma.registration.create({
-    data,
+    data: {
+      ...data,
+      userId: session?.user.id,
+    },
   });
   return registration;
 }

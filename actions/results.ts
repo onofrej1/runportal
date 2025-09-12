@@ -28,6 +28,9 @@ export async function getResultsByRunId(runId: number) {
 
 export async function getRegistrations(runId: number) {
   return prisma.registration.findMany({
+    include: {
+      category: true,
+    },
     where: {
       runId,
     },
