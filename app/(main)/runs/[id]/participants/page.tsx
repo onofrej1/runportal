@@ -1,6 +1,6 @@
 "use client";
 import { getRegistrations } from "@/actions/results";
-import React from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -16,19 +16,39 @@ import { getCategoryOptions } from "@/actions/runs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Form from "@/components/form/form";
-import { Check, SquareCheck } from "lucide-react";
-import { random } from "@/lib/utils";
+import { SquareCheck } from "lucide-react";
+import Paginator from "@/components/paginator/paginator";
+
+type Filter = {
+  runId: number;
+  search?: string;
+  categoryId?: number;
+  status?: boolean;
+  page?: number;
+};
 
 export default function Results() {
   const params = useParams();
+  const filter = useRef<Filter>({ runId: Number(params.id) });
 
   const {
-    data = [],
+    data: response,
+    refetch,    
     //isLoading: isRegionsLoading,
   } = useQuery({
-    queryKey: ["getResultsByRunId"],
-    queryFn: () => getRegistrations(Number(params.id)),
+    queryKey: ["getResultsByRunId", filter.current],
+    refetchOnWindowFocus: false,
+    queryFn: () => getRegistrations(filter.current),
+    initialData: { data: [], count: 0 },
   });
+
+  const { data, count } =  response;
+
+  const names = useMemo(() => data.map(value => {
+    return (
+      { label: value.firstName+' '+value.lastName, value: value.id }
+    )
+  }), [data]);
 
   const {
     data: categories = [],
@@ -51,37 +71,92 @@ export default function Results() {
     { name: "paid", header: "Platba" },
   ];
 
-  const fields: FormField[] = [
-    {
-      name: "search",
-      type: "text",
-      className: "w-md",
-      placeholder: "Hladaj meno ...",
-    },
-    {
-      name: "paid",
-      type: "select",
-      placeholder: "Platba",
-      className: "w-auto",
-      options: [
-        { label: "All statuses", value: "all" },
-        { label: "Zaplatene", value: "yes" },
-        { label: "Nezaplatene", value: "no" },
-      ],
-    },
-    {
-      name: "category",
-      type: "select",
-      placeholder: "Kategoria",
-      className: "w-auto",
-      options: categories.concat([{ label: "All categories", value: "all" }]),
-    },
-  ].map(
-    (f) =>
-      ({
-        ...f,
-        className: f.className + " !h-[40px]",
-      } as FormField)
+  const fields: FormField[] = useMemo(() => {
+    console.log("redner fields");
+    return [
+      {
+        name: "search",
+        type: "combobox",
+        //className: "w-md",
+        onChange: (value: string) => {
+          console.log(value);
+          filter.current = {
+            ...filter.current,
+            search: value === "" ? undefined : value,
+          };
+          refetch();
+        },
+        placeholder: "Hladaj meno ...",
+        options: names,
+      },
+      {
+        name: "paid",
+        type: "select",
+        placeholder: "Platba",
+        onChange: (value: string) => {
+          filter.current = {
+            ...filter.current,
+            status: value === "yes" ? true : value === 'all' ? undefined : false,
+          };
+          refetch();
+        },
+        className: "w-auto",
+        options: [
+          { label: "All statuses", value: "all" },
+          { label: "Zaplatene", value: "yes" },
+          { label: "Nezaplatene", value: "no" },
+        ],
+      },
+      {
+        name: "category",
+        type: "select",
+        onChange: (value: string) => {
+            filter.current = {
+            ...filter.current,
+            categoryId: value === "all" ? undefined : Number(value),
+          };
+          refetch();
+        },
+        placeholder: "Kategoria",
+        className: "w-auto",
+        options: categories,
+      },
+    ].map(
+      (f) =>
+        ({
+          ...f,
+          className: f.className + " !h-[40px]",
+        } as FormField)
+    );
+  }, [categories, names, refetch]);
+
+  //if (isFetching) return null;
+  console.log("render");
+
+  const MemoForm = useMemo(
+    () => (
+      <Form
+        fields={fields}
+        data={{ category: "all", paid: "all" }}
+        //data={{ runId: Number(params.id) }}
+        //action={sendRegistration}
+      >
+        {({ fields }) => (
+          <div>
+            {
+              <div className="flex gap-1">
+                <div className="flex-1 flex gap-3 items-center">
+                  {fields.search}
+                </div>
+                {fields.category}
+                {fields.paid}
+              </div>
+            }
+          </div>
+        )}
+      </Form>
+    ),
+    [fields]
   );
 
   return (
@@ -98,26 +173,7 @@ export default function Results() {
         </div>
 
         <div className="my-5 borderxx border-dashed border-gray-400 p-5x">
-          <Form
-            fields={fields}
-            data={{ category: 'all', paid: 'all' }}
-            //data={{ runId: Number(params.id) }}
-            //action={sendRegistration}
-          >
-            {({ fields }) => (
-              <div>
-                {
-                  <div className="flex gap-1">
-                    <div className="flex-1 flex gap-3 items-center">
-                      {fields.search}
-                    </div>
-                    {fields.category}
-                    {fields.paid}
-                  </div>
-                }
-              </div>
-            )}
-          </Form>
+          {MemoForm}
         </div>
 
         <Table>
@@ -133,8 +189,10 @@ export default function Results() {
           <TableBody>
             {data.map((reg) => (
               <TableRow key={reg.id}>
-                <TableCell className="font-medium"></TableCell>
-                <TableCell className="font-medium">{reg.category?.category}</TableCell>
+                <TableCell className="font-medium">{reg.id}</TableCell>
+                <TableCell className="font-medium">
+                  {reg.category?.category}
+                </TableCell>
                 {/*<TableCell className="font-medium">{result.bib}</TableCell>*/}
                 <TableCell className="font-medium">
                   {reg.lastName} {reg.firstName}
@@ -145,12 +203,28 @@ export default function Results() {
                 <TableCell className="font-medium">{reg.club}</TableCell>
                 <TableCell className="font-medium">{reg.gender}</TableCell>
                 <TableCell className="font-medium justify-center">
-                  {random([0, 1]) === 1 ? '[pending]' : <SquareCheck className="bg-green-700 text-white" />}
+                  {!reg.paid ? (
+                    "[pending]"
+                  ) : (
+                    <SquareCheck className="bg-green-700 text-white" />
+                  )}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+
+        <div className="flex justify-end">
+          <Paginator
+            currentPage={filter.current.page || 0}
+            totalPages={count}
+            onPageChange={(page) => {
+              filter.current = { ...filter.current, page };
+              refetch();
+            }}
+            showPreviousNext
+          />
+        </div>
       </CardContent>
     </Card>
   );

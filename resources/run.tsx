@@ -20,8 +20,7 @@ const run: Resource = {
           <div className="flex-1">{fields.distance}</div>
           <div className="flex-1">{fields.elevation}</div>
         </div>
-        {fields.surface}
-        {fields.price}
+        {fields.surface}        
         {fields.runCategories}
         <Button type="submit">Save</Button>
       </div>
@@ -29,8 +28,7 @@ const run: Resource = {
   },
   form: [
     { name: "title", type: "text", label: "Title" },
-    { name: "distance", type: "number", label: "Distance (m)" },
-    { name: "price", type: "number", label: "Price [eur]" },
+    { name: "distance", type: "number", label: "Distance (m)" },    
     { name: "elevation", type: "text", label: "Elevation (m)" },
     { name: "surface", type: "text", label: "Surface" },
     {

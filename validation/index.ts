@@ -117,7 +117,7 @@ export const CreateRun = z.object({
   id: idValue,
   title: stringValue,
   distance: numberValue,
-  price: numberValue,
+  //price: numberValue,
   elevation: numberValue,
   eventId: numberValue,
   runCategories: many2many, //z.array(z.coerce.number()).optional().default([]),

@@ -140,10 +140,12 @@ export async function getCategoryOptions(runId: number) {
   });
   console.log(models.length);
 
-  return models.map((model) => ({
+  const options = models.map((model) => ({
     value: model.id.toString(),
     label: model.title,
   }));
+  options.unshift({ label: "All categories", value: "all" });
+  return options;
 }
 
 export async function createRegistration(data: Registration) {

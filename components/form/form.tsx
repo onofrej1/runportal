@@ -36,6 +36,7 @@ import { DatePicker } from "./base/date-picker";
 import CheckboxGroup_ from "./base/checkbox-group";
 import CascadeInput from "./cascade-dropdown";
 import Range from "./base/range";
+import { Combobox } from "./combobox";
 
 export interface FormDataValue {
   //[key: string]: unknown;
@@ -115,8 +116,9 @@ export default function Form_<T = DefaultFormData>({
     if (!action) return;
 
     try {
+      console.log(data);
       const response = await action(data, form);
-      //form.reset();
+      //form.reset();      
       if (!response) {
         return;
       }
@@ -170,6 +172,22 @@ export default function Form_<T = DefaultFormData>({
                 className={className}
                 placeholder={formField.placeholder}
                 rows={formField.rows}
+              />
+            )}
+          />
+        )}
+
+        {type === "combobox" && (
+          <FormField
+            control={form.control}
+            name={name}
+            render={({ field }) => (
+              <Combobox
+                field={field}
+                options={formField.options}
+                label={label}
+                className={className}
+                placeholder={formField.placeholder}                
               />
             )}
           />

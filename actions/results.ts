@@ -26,15 +26,53 @@ export async function getResultsByRunId(runId: number) {
   });
 }
 
-export async function getRegistrations(runId: number) {
-  return prisma.registration.findMany({
+type Filter = {
+  runId: number;
+  search?: string;
+  categoryId?: number;
+  status?: boolean;
+  page?: number;
+}
+
+export async function getRegistrations(filter: Filter) {
+  const { runId, search, categoryId, status, page = 1 } = filter;
+  console.log('get reg', filter);
+  //const [firstName, lastName] = search?.split(' ');
+
+  const rowCount = await prisma.registration.count({    
+    where: {      
+      runId,
+      paid: status,
+      categoryId,      
+    },    
+  });
+
+  const registrations = await prisma.registration.findMany({
     include: {
       category: true,
     },
     where: {
+      /*OR: [
+        { 
+          firstName: {
+            contains: 
+          }
+        }
+      ],*/
       runId,
+      paid: status,
+      categoryId,      
     },
+    take: 10,
+    skip: (page -1 ) * 10,
+    orderBy: {
+      createdAt: 'asc',
+    }
   });
+
+  const count = Math.ceil(rowCount / 10);
+
+  return { data: registrations, count };
 }
 
 export async function createResults(data: RunResult[]) {

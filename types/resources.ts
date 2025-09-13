@@ -178,6 +178,11 @@ export interface RepeaterType extends BaseFormType {
   render?: RepeaterRenderFunc;
 }
 
+export interface ComboboxType extends BaseFormType {
+  type: "combobox";
+  options: { value: string, label: string}[];  
+}
+
 export interface CascaderType extends BaseFormType {
   type: "cascader";
   fields: FormField/* & { populate: string }*/[];
@@ -203,7 +208,8 @@ type FormField =
   | MultipleSelectorType
   | RadioGroup
   | CascaderType
-  | CheckboxGroup;
+  | CheckboxGroup
+  | ComboboxType;
 
 type Resource = {
   name: string;
