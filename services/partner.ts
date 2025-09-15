@@ -1,14 +1,14 @@
 import { Pagination, OrderBy, SearchParam } from "@/services";
 import { prisma } from "@/db/prisma";
-import { Question } from "@/generated/prisma";
+import { Partner } from "@/generated/prisma";
 import { applyFilters } from "@/lib/resources-filter";
 
-export const questionService = {
+export const partnerService = {
   getAll: async (
     pagination: Pagination,
     search: SearchParam,
     orderBy: OrderBy[]
-  ): Promise<[Question[], number]> => {
+  ): Promise<[Partner[], number]> => {
     const { limit, offset } = pagination;
     const { filters, operator } = search;
 
@@ -17,7 +17,7 @@ export const questionService = {
     });
 
     const where = applyFilters(filters, operator);
-    const rowCount = await prisma.question.aggregate({
+    const rowCount = await prisma.partner.aggregate({
       where,
       _count: {
         id: true,
@@ -26,7 +26,7 @@ export const questionService = {
 
     const pageCount = Math.ceil(rowCount._count.id / Number(limit));
 
-    const data = await prisma.question.findMany({
+    const data = await prisma.partner.findMany({
       take: limit,
       skip: offset,
       orderBy: orderByQuery,
@@ -37,29 +37,29 @@ export const questionService = {
   },
 
   get: async (id: number) => {
-    return await prisma.question.findFirst({
+    return await prisma.partner.findFirst({
       where: { id: Number(id) },
     });
   },
 
-  create: async (data: Question) => {
-    await prisma.question.create({ data });
+  create: async (data: Partner) => {
+    await prisma.partner.create({ data });
   },
 
-  update: async (data: Question) => {
-    await prisma.question.update({ where: { id: data.id }, data });
+  update: async (data: Partner) => {
+    await prisma.partner.update({ where: { id: data.id }, data });
   },
 
   delete: async (id: number[]) => {
-    await prisma.question.deleteMany({ where: { id: { in: id } } });
+    await prisma.partner.deleteMany({ where: { id: { in: id } } });
   },
 
   getOptions: async () => {
-    const questions = await prisma.question.findMany();
+    const models = await prisma.partner.findMany();
 
-    return questions.map((question) => ({
-      value: question.id,
-      label: question.title,
+    return models.map((model) => ({
+      value: model.id,
+      label: model.name,
     }));
   },
 };

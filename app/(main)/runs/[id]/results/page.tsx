@@ -1,6 +1,6 @@
 "use client";
 import { getResultsByRunId } from "@/actions/results";
-import React from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,32 +12,50 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { FormField } from "@/types/resources";
-import { getCategoryOptions } from "@/actions/runs";
+import { getCategoryResultsOptions, getSearchOptions } from "@/actions/runs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Form from "@/components/form/form";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import Paginator from "@/components/paginator/paginator";
+
+type Filter = {
+  runId: number;
+  search?: string;
+  category?: string;
+  page: number;
+};
 
 export default function Results() {
   const params = useParams();
+  const filter = useRef<Filter>({ runId: Number(params.id), page: 1 });
+  const [query, setQuery] = useState('');
 
   const {
-    data: results = [],
-    //isLoading: isRegionsLoading,
+    data: response,
+    refetch,
   } = useQuery({
     queryKey: ["getResultsByRunId"],
-    queryFn: () => getResultsByRunId(Number(params.id)),
+    queryFn: () => getResultsByRunId(filter.current),
+    initialData: { data: [], count: 0 },
+  });
+
+  const { data, count } = response;
+
+  const {
+    data: options = [],
+    refetch: refetchSearchOptions,
+  } = useQuery({
+    queryKey: ["getSearchOptions"],
+    queryFn: () => getSearchOptions(Number(params.id), query),
   });
 
   const {
-    data: categories = [],
-    //isLoading: isRegionsLoading,
+    data: categories = [],    
   } = useQuery({
     queryKey: ["getCategoryOptions"],
-    queryFn: () => getCategoryOptions(Number(params.id)),
-  });
-
-  console.log(categories);
+    queryFn: () => getCategoryResultsOptions(Number(params.id)),
+  });  
 
   const headers = [
     { name: "rank", header: "Rank" },
@@ -51,25 +69,33 @@ export default function Results() {
   ];
 
   const fields: FormField[] = [
-    { name: "search", type: "text", className: "w-full" },
     {
-      name: "gender",
-      type: "select",
-      placeholder: "Pohlavie",
-      className: "w-auto",
-      options: [
-        { label: "Man", value: "MALE" },
-        { label: "Woman", value: "FEMALE" },
-      ],
-    },
-    {
-      name: "category",
-      type: "select",
-      placeholder: "Kategoria",
-      className: "w-auto",
-      options: categories,
+      name: "search",
+      type: "combobox",
+      //className: "w-md",
+      onChange: (value: string) => {
+        filter.current = {
+          ...filter.current,
+          search: value === "" ? undefined : value,
+        };
+        refetch();
+      },
+      onInputChange: (value) => {
+        setQuery(value);
+        refetchSearchOptions();
+      },
+      placeholder: "Hladaj meno ...",
+      options,
     },
   ];
+
+  const setCategoryFilter = (category: string) => {
+    filter.current = {
+      ...filter.current,
+      category,
+    };
+    refetch();
+  };
 
   return (
     <Card className=" bg-white p-6 border-t-4 rounded-md border-t-green-700">
@@ -84,43 +110,33 @@ export default function Results() {
           </p>
         </div>
 
-        <ToggleGroup className="my-4" variant="outline" type="multiple">
-          <ToggleGroupItem
-            value="bold"
-            aria-label="Toggle bold"
-          >Muzi do 40r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="italic"
-            aria-label="Toggle italic"
-          >Muzi do 50r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="strikethrough"
-            aria-label="Toggle strikethrough"
-          >Zeny do 40r</ToggleGroupItem>
-          <ToggleGroupItem
-            value="strikethrough"
-            aria-label="Toggle strikethrough"
-          >Zeny do 60r</ToggleGroupItem>
-        </ToggleGroup>
-
-        <Form
-          fields={fields}
-          //data={{ runId: Number(params.id) }}
-          //action={sendRegistration}
-        >
-          {({ fields }) => (
-            <div>
-              {/*<div className="flex gap-1">
-                <div className="flex-1 flex gap-3 items-center">
-                  <label>Search</label>
-                  {fields.search}
+        <div className="flex flex-col items-center">
+          <Form fields={fields}>
+            {({ fields }) => (
+              <div>
+                <div className="flex gap-1">
+                  <div className="flex-1 flex gap-3 items-center">
+                    <label>Hladaj meno</label>
+                    {fields.search}
+                  </div>
                 </div>
-                {fields.category}
-                {fields.gender}
-              </div>*/}
-            </div>
-          )}
-        </Form>
+              </div>
+            )}
+          </Form>
+
+          <ToggleGroup className="my-4" variant="outline" type="single">
+            {categories.map((category) => (
+              <ToggleGroupItem
+                className="px-3"
+                key={category.value}
+                value={category.value}
+                onClick={() => setCategoryFilter(category.value)}
+              >
+                {category.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
 
         <Table>
           <TableHeader>
@@ -133,7 +149,7 @@ export default function Results() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {results.map((result) => (
+            {data.map((result) => (
               <TableRow key={result.id}>
                 <TableCell className="font-medium">{result.rank}</TableCell>
                 <TableCell className="font-medium">{result.category}</TableCell>
@@ -151,6 +167,18 @@ export default function Results() {
             ))}
           </TableBody>
         </Table>
+
+        <div className="flex justify-end">
+          <Paginator
+            currentPage={filter.current.page}
+            totalPages={count}
+            onPageChange={(page) => {
+              filter.current = { ...filter.current, page };
+              refetch();
+            }}
+            showPreviousNext
+          />
+        </div>
       </CardContent>
     </Card>
   );

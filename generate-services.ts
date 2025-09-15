@@ -52,12 +52,18 @@ const models = [
   //{ name: "registration", table: "registration", entity: "Registration", optionField: "name" },
   //{ name: "gallery", table: "gallery", entity: "Gallery", optionField: "name" },
   {
+    name: "partner",
+    table: "partner",
+    entity: "Partner",
+    optionField: "name",
+  },
+  {
     name: "eventType",
     table: "eventType",
     entity: "EventType",
     optionField: "type",
   },
-  { name: "venue", table: "venue", entity: "Venue", optionField: "location" },
+  { name: "location", table: "location", entity: "Location", optionField: "location" },
   {
     name: "organizer",
     table: "organizer",

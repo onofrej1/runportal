@@ -21,6 +21,8 @@ export const resources = {
   galleries: prisma.gallery,
   registrations: prisma.registration,
   runResults: prisma.runResult,
+  locations: prisma.location,
+  partners: prisma.partner,
 };
 
 export type Resource = keyof typeof resources | "users";

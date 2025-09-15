@@ -26,22 +26,20 @@ type ComboboxProps = {
   placeholder?: string;
   className?: string;
   onChange?: (value: string) => void;
+  onInputChange?: (value: string) => void;
   field: ControllerRenderProps;
   options: { value: string; label: string }[];
 };
 
 export function Combobox(props: ComboboxProps) {
-  const { options, label, onChange, className, placeholder, field } = props;
-  const [open, setOpen] = React.useState(false);  
-  console.log(options, field.value);
+  const { options, label, onChange, onInputChange, className, placeholder, field } = props;
+  const [open, setOpen] = React.useState(false);
 
   const Element = (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
-          aria-expanded={open}
           className={cn("w-[200px] justify-between", className)}
         >
           {field.value
@@ -51,8 +49,17 @@ export function Combobox(props: ComboboxProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder={placeholder || "Search ..."} className="h-9" />
+        <Command
+          filter={(value, search) => {            
+            const option = options.find(o => o.value === value);
+            return option?.label.includes(search) ? 1 : 0;
+          }}
+        >
+          <CommandInput
+            onValueChange={onInputChange}
+            placeholder={placeholder || "Search ..."}
+            className="h-9"
+          />
           <CommandList>
             <CommandEmpty>No data found.</CommandEmpty>
             <CommandGroup>
@@ -61,10 +68,9 @@ export function Combobox(props: ComboboxProps) {
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    const option = options.find(o => o.label === currentValue);
-                    /*const newValue =
-                      currentValue === field.value ? "" : currentValue;
-                    console.log('n', currentValue, newValue);*/
+                    const option = options.find(
+                      (o) => o.value === currentValue
+                    );
                     field.onChange(option?.value);
                     setOpen(false);
                     onChange?.(option?.value || '');

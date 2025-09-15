@@ -19,6 +19,8 @@ import { mediaCommentService } from "./mediaComment";
 import { galleryService } from "./gallery";
 import { registrationService } from "./registration";
 import { runResultService } from "./runResult";
+import { locationService } from "./location";
+import { partnerService } from "./partner";
 
 export type Pagination = {
   limit: number;
@@ -51,12 +53,9 @@ export type UnionToIntersection<U> =
   (U extends unknown ? (x: U)=>void : never) extends ((x: infer I)=>void) ? I : never;
 
 type Service =  
-  //| typeof userService
-  //| typeof questionService
-  //| typeof questionChoiceService
+  //| typeof userService  
   | typeof organizerService
   | typeof postService
-  //| typeof venueService
   | typeof categoryService
   | typeof tagService
   | typeof eventService
@@ -69,11 +68,12 @@ type Service =
   | typeof runService
   | typeof registrationService
   | typeof runResultService
-  | typeof galleryService;
+  | typeof galleryService
+  | typeof locationService
+  | typeof partnerService;
 
 const services = new Map<Resource, Service>([
   //["users", userService],
-  //["venues", venueService],
   ["events", eventService],
   ["eventTypes", eventTypeService],
   ["organizers", organizerService],
@@ -81,23 +81,23 @@ const services = new Map<Resource, Service>([
   ["categories", categoryService],
   ["tags", tagService],
   ["runCategories", runCategoryService],
-  ["runs", runService],
-  //["questions", questionService],
-  //["questionChoices", questionChoiceService],
+  ["runs", runService],  
   ["media", mediaService],
   ["mediaTypes", mediaTypeService],
   ["mediaCategories", mediaCategoryService],
   ["mediaComments", mediaCommentService],
   ['galleries', galleryService],
   ['registrations', registrationService],
-  ['runResults', runResultService]
+  ['runResults', runResultService],
+  ['locations', locationService],
+  ['partners', partnerService]
 ]);
 
 export function getDataService(resource: Resource) {
   if (services.has(resource)) {
     return services.get(resource)!;
   }
-  throw new Error('Service not found');
+  throw new Error('Service not found '+ resource);
 }
 
 

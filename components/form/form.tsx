@@ -10,6 +10,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { JSX, useEffect } from "react";
 import {
+  DatePickerType,
   FormField as FormField_,
   MultipleSelectorType,
   RangeType,
@@ -118,7 +119,7 @@ export default function Form_<T = DefaultFormData>({
     try {
       console.log(data);
       const response = await action(data, form);
-      //form.reset();      
+      //form.reset();
       if (!response) {
         return;
       }
@@ -187,7 +188,9 @@ export default function Form_<T = DefaultFormData>({
                 options={formField.options}
                 label={label}
                 className={className}
-                placeholder={formField.placeholder}                
+                placeholder={formField.placeholder}
+                onChange={formField.onChange}
+                onInputChange={formField.onInputChange}
               />
             )}
           />
@@ -247,7 +250,12 @@ export default function Form_<T = DefaultFormData>({
               name={name}
               render={({ field }) => (
                 <>
-                  <DatePicker label={label} field={field} className={className} />
+                  <DatePicker
+                    label={label}
+                    field={field}
+                    className={className}
+                    onChange={(formField as DatePickerType).onChange}
+                  />
                 </>
               )}
             />

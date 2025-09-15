@@ -17,6 +17,7 @@ const event: Resource = {
       <div className="flex flex-col gap-4">
         {fields.name}
         {fields.description}
+        {fields.locationId}
         <div className="flex gap-2">
           <div className="flex-1">{fields.status}</div>
           <div className="flex-1">{fields.color}</div>
@@ -40,17 +41,16 @@ const event: Resource = {
     { name: "description", type: "textarea", label: "Description" },
     { name: "status", type: "text", label: "Status" },
     { name: "color", type: "text", label: "Color" },
-    { name: "contact", type: "text", label: "Contact" },
-    { name: "location", type: "text", label: "Location" },
+    { name: "contact", type: "text", label: "Contact" },    
     { name: "maxAttendees", type: "number", label: "Max attendees" },
     { name: "startDate", type: "date-picker", label: "Start date" },
     { name: "endDate", type: "date-picker", label: "End date" },
     {
-      name: "venueId",
+      name: "locationId",
       type: "foreignKey",
-      relation: "venue",
-      label: "Venue",
-      resource: "venues",
+      relation: "location",
+      label: "Location",
+      resource: "locations",
     },
     {
       name: "organizerId",

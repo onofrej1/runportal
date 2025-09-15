@@ -1,14 +1,14 @@
 import { Pagination, OrderBy, SearchParam } from "@/services";
 import { prisma } from "@/db/prisma";
-import { Venue } from "@/generated/prisma";
+import { Location } from "@/generated/prisma";
 import { applyFilters } from "@/lib/resources-filter";
 
-export const venueService = {
+export const locationService = {
   getAll: async (
     pagination: Pagination,
     search: SearchParam,
     orderBy: OrderBy[]
-  ): Promise<[Venue[], number]> => {
+  ): Promise<[Location[], number]> => {
     const { limit, offset } = pagination;
     const { filters, operator } = search;
 
@@ -17,7 +17,7 @@ export const venueService = {
     });
 
     const where = applyFilters(filters, operator);
-    const rowCount = await prisma.venue.aggregate({
+    const rowCount = await prisma.location.aggregate({
       where,
       _count: {
         id: true,
@@ -26,7 +26,7 @@ export const venueService = {
 
     const pageCount = Math.ceil(rowCount._count.id / Number(limit));
 
-    const data = await prisma.venue.findMany({
+    const data = await prisma.location.findMany({
       take: limit,
       skip: offset,
       orderBy: orderByQuery,
@@ -37,25 +37,25 @@ export const venueService = {
   },
 
   get: async (id: number) => {
-    return await prisma.venue.findFirst({
+    return await prisma.location.findFirst({
       where: { id: Number(id) },
     });
   },
 
-  create: async (data: Venue) => {
-    await prisma.venue.create({ data });
+  create: async (data: Location) => {
+    await prisma.location.create({ data });
   },
 
-  update: async (data: Venue) => {
-    await prisma.venue.update({ where: { id: data.id }, data });
+  update: async (data: Location) => {
+    await prisma.location.update({ where: { id: data.id }, data });
   },
 
   delete: async (id: number[]) => {
-    await prisma.venue.deleteMany({ where: { id: { in: id } } });
+    await prisma.location.deleteMany({ where: { id: { in: id } } });
   },
 
   getOptions: async () => {
-    const models = await prisma.venue.findMany();
+    const models = await prisma.location.findMany();
 
     return models.map((model) => ({
       value: model.id,

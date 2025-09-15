@@ -286,6 +286,7 @@ model Event {
   attachments    EventAttachment[]
   galleries      Gallery[]
   //eventInfo      EventInfo[]
+  partners       Partner[]
 }
 
 model EventType {
@@ -310,6 +311,14 @@ model Organizer {
   id     Int     @id @default(autoincrement())
   name   String
   events Event[]
+}
+
+model Partner {
+  id      Int     @id @default(autoincrement())
+  name    String
+  logo    String?
+  contact String?
+  events  Event[]
 }
 
 model Location {
@@ -399,6 +408,7 @@ model RunEntryFee {
 model RunCategory {
   id            Int            @id @default(autoincrement())
   category      String
+  order         Int
   title         String
   runs          Run[]
   registrations Registration[]

@@ -18,12 +18,41 @@ export async function getResults() {
   });
 }
 
-export async function getResultsByRunId(runId: number) {
-  return prisma.runResult.findMany({
+type ResultFilter = {
+  runId: number;
+  search?: string;
+  category?: string;  
+  page?: number;
+};
+
+export async function getResultsByRunId(filter: ResultFilter) {
+  const { runId, search, category, page = 1} = filter;
+  const pageCount = 20;
+
+  const rowCount = await prisma.runResult.count({    
     where: {
-      runId,
-    },
+      id: search ? Number(search) : undefined,
+      runId,     
+      category,
+    },   
   });
+
+  const results = await prisma.runResult.findMany({
+    where: {
+      id: search ? Number(search) : undefined,
+      runId,
+      category 
+    },
+    take: 10,
+    skip: (page -1 ) * pageCount,
+    orderBy: {
+      rank: 'asc',
+    }
+  });
+
+  const count = Math.ceil(rowCount / pageCount);
+
+  return { data: results, count };
 }
 
 type Filter = {
@@ -37,6 +66,7 @@ type Filter = {
 export async function getRegistrations(filter: Filter) {
   const { runId, search, categoryId, status, page = 1 } = filter;
   console.log('get reg', filter);
+  const pageCount = 20;
   //const [firstName, lastName] = search?.split(' ');
 
   const rowCount = await prisma.registration.count({    
@@ -64,13 +94,13 @@ export async function getRegistrations(filter: Filter) {
       categoryId,      
     },
     take: 10,
-    skip: (page -1 ) * 10,
+    skip: (page -1 ) * pageCount,
     orderBy: {
       createdAt: 'asc',
     }
   });
 
-  const count = Math.ceil(rowCount / 10);
+  const count = Math.ceil(rowCount / pageCount);
 
   return { data: registrations, count };
 }

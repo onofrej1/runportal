@@ -3,7 +3,7 @@ import { getRegionOptions, getRuns } from "@/actions/runs";
 import Form from "@/components/form/form";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
-import { FormField } from "@/types/resources";
+import { FormField, SelectOption } from "@/types/resources";
 import { useQuery } from "@tanstack/react-query";
 import {
   Info,
@@ -13,15 +13,18 @@ import {
   TreePine,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useMemo, useRef } from "react";
 
 export default function Events() {
   const { data } = useSession();
   console.log(data);
 
   const filter = useRef<{
-    dateFrom?: string;
-    dateTo?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+    distance?: number[];
+    elevation?: number[];
+    eventType?: string[];
     region?: string[];
   }>({});
 
@@ -52,11 +55,33 @@ export default function Events() {
         type: "multiple-select",
         label: "Kraj",
         options: regions,
+        onChange: (value: SelectOption[]) => {
+          let region;
+          if (value.length > 0) {
+            region = value.map((option) => option.value);
+          }
+          filter.current = {
+            ...filter.current,
+            region,
+          };
+          refetch();
+        },
       },
       {
         name: "eventType",
         type: "multiple-select",
         label: "Typ sportu",
+        onChange: (value: SelectOption[]) => {
+          let eventType;
+          if (value.length > 0) {
+            eventType = value.map((option) => option.value);
+          }
+          filter.current = {
+            ...filter.current,
+            eventType,
+          };
+          refetch();
+        },
         options: [
           { value: "1", label: "Beh" },
           { value: "2", label: "Beh so psom" },
@@ -64,15 +89,44 @@ export default function Events() {
           { value: "4", label: "Cyklistika" },
         ],
       },
-      { name: "dateFrom", type: "date-picker", label: "Datum od" },
-      { name: "dateTo", type: "date-picker", label: "Datum do" },
-      { name: "locality", type: "text", label: "Lokalita" },
+      {
+        name: "dateFrom",
+        type: "date-picker",
+        label: "Datum od",
+        onChange: (value: Date | undefined) => {
+          filter.current = {
+            ...filter.current,
+            dateFrom: value,
+          };
+          refetch();
+        },
+      },
+      {
+        name: "dateTo",
+        type: "date-picker",
+        label: "Datum do",
+        onChange: (value: Date | undefined) => {
+          filter.current = {
+            ...filter.current,
+            dateTo: value,
+          };
+          refetch();
+        },
+      },
+      //{ name: "locality", type: "text", label: "Lokalita" },
       {
         name: "distance",
         type: "range",
         min: 0,
         max: 100,
         label: "Dlzka trate",
+        onChange: (value: number[]) => {
+          filter.current = {
+            ...filter.current,
+            distance: value,
+          };
+          refetch();
+        },
       },
       {
         name: "elevation",
@@ -80,30 +134,16 @@ export default function Events() {
         min: 0,
         max: 2000,
         label: "Prevysenie",
+        onChange: (value: number[]) => {
+          filter.current = {
+            ...filter.current,
+            elevation: value,
+          };
+          refetch();
+        },
       },
     ],
-    [regions]
-  );
-
-  const sendForm = useCallback(
-    async (data: any) => {
-      console.log("data", data);
-      if (data.eventType && data.eventType.length > 0) {
-        data.eventType = data.eventType.map((option: any) => option.value);
-      } else {
-        data.eventType = undefined;
-      }
-
-      if (data.region && data.region.length > 0) {
-        data.region = data.region.map((option: any) => option.value);
-      } else {
-        data.region = undefined;
-      }
-      filter.current = data;
-      refetch();
-      return {};
-    },
-    [refetch]
+    [refetch, regions]
   );
 
   const CalIcon = (date: Date) => {
@@ -153,7 +193,7 @@ export default function Events() {
   const MemoForm = useMemo(() => {
     console.log("rerender form");
     return (
-      <Form fields={fields} action={sendForm}>
+      <Form fields={fields}>
         {({ fields }) => (
           <div>
             <div className="flex flex-col gap-3 pb-4">
@@ -166,14 +206,12 @@ export default function Events() {
               <div className="mb-10">{fields.distance}</div>
               <div className="mb-10">{fields.elevation}</div>
               {fields.locality}
-
-              <Button type="submit">Search</Button>
             </div>
           </div>
         )}
       </Form>
     );
-  }, [fields, sendForm]);
+  }, [fields]);
 
   if (isLoading) return;
   console.log(runs);
@@ -259,8 +297,8 @@ export default function Events() {
                   <div className="flex gap-2 items-center">
                     <MapPin size={16} color="#000000" />
                     <span className="overflow-ellipsis whitespace-nowrap overflow-hidden">
-                      {run.event.location?.location}{' '}
-                      ({run.event.location?.district.region.region})
+                      {run.event.location?.location} (
+                      {run.event.location?.district.region.region})
                     </span>
                   </div>
                 </div>

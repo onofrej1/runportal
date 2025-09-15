@@ -84,10 +84,8 @@ export const CreateEvent = z.object({
   status: stringValue,
   contact: stringValue,
   color: stringValue,
-  location: optionalString,
-  venueId: z.coerce.number().nullable(),
-  organizerId: z.coerce.number().nullable(),
-  maxAttendees: z.coerce.number().nullable(),
+  locationId: z.coerce.number().nullable(),  
+  organizerId: z.coerce.number().nullable(),  
   startDate: z.date(),
   endDate: z.date(),
 });
@@ -106,6 +104,13 @@ export const CreateRunCategory = z.object({
 export const CreateOrganizer = z.object({
   id: idValue,
   name: stringValue,
+});
+
+export const CreatePartner = z.object({
+  id: idValue,
+  name: stringValue,
+  logo: z.string().optional(),
+  contact: z.string().optional(),
 });
 
 /*export const CreateVenue = z.object({

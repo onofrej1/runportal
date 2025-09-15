@@ -72,14 +72,13 @@ export default function Results() {
   ];
 
   const fields: FormField[] = useMemo(() => {
-    console.log("redner fields");
     return [
       {
         name: "search",
         type: "combobox",
         //className: "w-md",
         onChange: (value: string) => {
-          console.log(value);
+          //console.log(value);
           filter.current = {
             ...filter.current,
             search: value === "" ? undefined : value,

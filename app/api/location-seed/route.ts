@@ -13,17 +13,17 @@ export async function GET() {
   console.log("cities", cities);
   //const districts: Partial<District>[] = [];
 
-  const codes = {    
-      "Košický": "KE",
-      "Bratislavský": "BA",
-      "Banskobystrický kraj": "BB",
-       "Prešovský": "PO",
-       "Nitriansky": "NR",
-       "Trenčiansky kraj": "TC",
-      "Trnavský kraj": "TV",
-      "Žilinský kraj": "ZA",    
-  }
-  
+  const codes = {
+    "Košický kraj": "KE",
+    "Bratislavský kraj": "BA",
+    "Banskobystrický kraj": "BB",
+    "Prešovský kraj": "PO",
+    "Nitriansky kraj": "NR",
+    "Trenčiansky kraj": "TC",
+    "Trnavský kraj": "TV",
+    "Žilinský kraj": "ZA",
+  };
+
   for (const region of Object.keys(cities)) {
     await prisma.region.create({
       data: {
@@ -36,7 +36,7 @@ export async function GET() {
         region,
       },
     });
-    console.log('region', region);
+
     for (const district of Object.keys(cities[region as keyof typeof cities])) {
       await prisma.district.create({
         data: {
@@ -52,10 +52,10 @@ export async function GET() {
       });
 
       const regionData = cities[region as keyof typeof cities];
-      //console.log('district', district);
-      //console.log(regionData[district]);
-      for (const location of regionData[district as keyof typeof regionData] as string[]) {
-        //console.log('loc', location);
+
+      for (const location of regionData[
+        district as keyof typeof regionData
+      ] as string[]) {
         await prisma.location.create({
           data: {
             location,

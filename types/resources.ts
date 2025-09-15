@@ -135,6 +135,7 @@ export interface DatePickerType extends BaseFormType {
   type: "date-picker";
   granularity?: "day" | "hour" | "minute" | "second";
   displayFormat?: { hour24?: string; hour12?: string };
+  onChange?: (value: Date | undefined) => void;
 }
 
 export interface CheckboxType extends BaseFormType {
@@ -180,7 +181,9 @@ export interface RepeaterType extends BaseFormType {
 
 export interface ComboboxType extends BaseFormType {
   type: "combobox";
-  options: { value: string, label: string}[];  
+  options: { value: string, label: string}[];
+  onChange?: (value: string) => void;
+  onInputChange?: (value: string) => void;
 }
 
 export interface CascaderType extends BaseFormType {

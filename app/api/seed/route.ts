@@ -287,19 +287,12 @@ export async function GET() {
       eventId: i,
     });
 
-    /*attendees.push({
-      status: random(["PENDING", "YES", "MAYBE", "NO", "ATTENDED"]),
-      eventId: random([1, 2, 3]),
-      userId: random(userIds),
-    });*/
-
     runs.push({
       title: faker.lorem.words({ min: 2, max: 3 }),
       distance: random([5000, 10000, 21097, 15000]),
       elevation: faker.number.int({ min: 10, max: 600 }),
       registerEndDate: faker.date.future(),
       maxAttendees: random([80, 120, 150, 200, 300]),
-      //price: random([10, 15, 20, 25]),
       surface: random(["road", "grass"]),
       eventId: i,
       tshirt: i % 2 === 0 ? true : false,
@@ -346,7 +339,7 @@ export async function GET() {
       name: faker.person.fullName(),
       category: random(runCategories_.map(c => c.category)),
       club: random(clubs),
-      bib: faker.number.int({ min: 50, max: 250 }),
+      bib: faker.number.int({ min: 50, max: 250 }).toString(),
       gender: random(["MALE", "FEMALE"]),
       rank: ++rank[runId],
       runId,

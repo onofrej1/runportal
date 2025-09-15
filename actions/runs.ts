@@ -1,13 +1,14 @@
 "use server";
 
+import { P } from "@/components/typography";
 import { prisma } from "@/db/prisma";
 import { Registration } from "@/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 type SearchParams = {
-  dateFrom?: string;
-  dateTo?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
   distance?: number[];
   elevation?: number[];
   eventType?: string[];
@@ -21,10 +22,10 @@ export async function getRuns(search: SearchParams) {
     where: {
       event: {
         endDate: {
-          lt: dateTo ? new Date(dateTo) : undefined,
+          lt: dateTo ? dateTo : undefined,
         },
         startDate: {
-          gt: dateFrom ? new Date(dateFrom) : undefined,
+          gt: dateFrom ? dateFrom : undefined,
         },
         eventType: {
           id: {
@@ -121,7 +122,7 @@ export async function getRegionOptions() {
   const models = await prisma.region.findMany();
 
   return models.map((model) => ({
-    value: model.id,
+    value: model.id.toString(),
     label: model.region,
   }));
 }
@@ -138,13 +139,60 @@ export async function getCategoryOptions(runId: number) {
       },
     },
   });
+
+  const options = models.map((model) => ({
+    value: model.id.toString(),
+    label: model.category,
+  }));
+  options.unshift({ label: "All categories", value: "all" });
+  return options;
+}
+
+export async function getSearchOptions(runId: number, query: string) {
+  if (!query) {
+    return [];
+  }
+
+  const models = await prisma.runResult.findMany({
+    where: {
+      runId,
+      name: {
+        contains: query,
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+    }
+  });
   console.log(models.length);
 
   const options = models.map((model) => ({
     value: model.id.toString(),
-    label: model.title,
+    label: model.name,
   }));
-  options.unshift({ label: "All categories", value: "all" });
+
+  //options.unshift({ label: "All categories", value: "all" });
+  return options;
+}
+
+export async function getCategoryResultsOptions(runId: number) {
+  const models = await prisma.runResult.findMany({
+    where: {
+      runId,    
+    },
+    distinct: ['category'],
+    select: {
+      category: true,
+    }
+  });
+
+  const options = models.map((model) => ({
+    value: model.category,
+    label: model.category,
+  }));
+
+  //options.unshift({ label: "All categories", value: "all" });
   return options;
 }
 

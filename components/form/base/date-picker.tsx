@@ -19,19 +19,20 @@ interface DatePickerProps {
   label?: string;
   className?: string;
   field: ControllerRenderProps;
+  onChange?: (value: Date | undefined) => void;
 }
 
 export function DatePicker(props: DatePickerProps) {
-  const { label, field, className } = props;
+  const { label, field, className, onChange } = props;
   const value = field.value;
   const { error } = useFormField();
 
   React.useEffect(() => {
     if (value && typeof value === "string") {
       const dateValue = new Date(value);
-      field.onChange(dateValue);
+      field.onChange(dateValue);      
     }
-  }, [field, value]);
+  }, [field, onChange, value]);
 
   const Element = (
     <Popover>
@@ -56,6 +57,7 @@ export function DatePicker(props: DatePickerProps) {
           captionLayout="dropdown"
           onSelect={(e) => {
             field.onChange(e);
+            onChange?.(e);
           }}
           //initialFocus
         />

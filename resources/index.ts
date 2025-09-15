@@ -6,7 +6,6 @@ import { event } from "@/resources/event";
 import { tag } from "@/resources/tag";
 import { run } from "@/resources/run";
 import { runCategory } from "@/resources/runCategory";
-import { venue } from "@/resources/venue";
 import { organizer } from "@/resources/organizer";
 import { Resource } from "@/types/resources";
 import { mediaComment } from "./mediaComment";
@@ -17,6 +16,7 @@ import { gallery } from "./gallery";
 import { eventType } from "./eventType";
 import { registration } from "./registration";
 import { runResult } from "./runResult";
+import { partner } from "./partner";
 
 const resources: Resource[] = [
   registration,
@@ -27,7 +27,7 @@ const resources: Resource[] = [
   tag,
   run,
   runCategory,
-  venue,
+  partner,
   organizer,
   question,
   questionChoice,
