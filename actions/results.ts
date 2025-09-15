@@ -65,9 +65,8 @@ type Filter = {
 
 export async function getRegistrations(filter: Filter) {
   const { runId, search, categoryId, status, page = 1 } = filter;
-  console.log('get reg', filter);
+
   const pageCount = 20;
-  //const [firstName, lastName] = search?.split(' ');
 
   const rowCount = await prisma.registration.count({    
     where: {      

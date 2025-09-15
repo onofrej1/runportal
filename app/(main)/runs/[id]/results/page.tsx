@@ -29,7 +29,7 @@ type Filter = {
 export default function Results() {
   const params = useParams();
   const filter = useRef<Filter>({ runId: Number(params.id), page: 1 });
-  const [query, setQuery] = useState('');
+  const query = useRef('');  
 
   const {
     data: response,
@@ -47,7 +47,7 @@ export default function Results() {
     refetch: refetchSearchOptions,
   } = useQuery({
     queryKey: ["getSearchOptions"],
-    queryFn: () => getSearchOptions(Number(params.id), query),
+    queryFn: () => getSearchOptions(Number(params.id), query.current),
   });
 
   const {
@@ -79,9 +79,13 @@ export default function Results() {
           search: value === "" ? undefined : value,
         };
         refetch();
+
+        const option = options.find(o => o.value === value);
+        query.current = option ? option.label : '';
+        refetchSearchOptions();
       },
       onInputChange: (value) => {
-        setQuery(value);
+        query.current = value;
         refetchSearchOptions();
       },
       placeholder: "Hladaj meno ...",
@@ -110,7 +114,7 @@ export default function Results() {
           </p>
         </div>
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col">
           <Form fields={fields}>
             {({ fields }) => (
               <div>

@@ -78,7 +78,6 @@ export default function Results() {
         type: "combobox",
         //className: "w-md",
         onChange: (value: string) => {
-          //console.log(value);
           filter.current = {
             ...filter.current,
             search: value === "" ? undefined : value,

@@ -148,7 +148,7 @@ export async function getCategoryOptions(runId: number) {
   return options;
 }
 
-export async function getSearchOptions(runId: number, query: string) {
+export async function getSearchOptions(runId: number, query: string) { 
   if (!query) {
     return [];
   }
@@ -164,15 +164,13 @@ export async function getSearchOptions(runId: number, query: string) {
       id: true,
       name: true,
     }
-  });
-  console.log(models.length);
+  });  
 
   const options = models.map((model) => ({
     value: model.id.toString(),
     label: model.name,
   }));
 
-  //options.unshift({ label: "All categories", value: "all" });
   return options;
 }
 

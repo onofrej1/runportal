@@ -34,6 +34,7 @@ type ComboboxProps = {
 export function Combobox(props: ComboboxProps) {
   const { options, label, onChange, onInputChange, className, placeholder, field } = props;
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');  
 
   const Element = (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,24 +57,35 @@ export function Combobox(props: ComboboxProps) {
           }}
         >
           <CommandInput
-            onValueChange={onInputChange}
+            onValueChange={(value) => {
+              setSearch(value);
+              onInputChange?.(value);
+            }}
             placeholder={placeholder || "Search ..."}
             className="h-9"
           />
           <CommandList>
-            <CommandEmpty>No data found.</CommandEmpty>
-            <CommandGroup>
+            {search && <CommandEmpty>No data found.</CommandEmpty>}
+            <CommandGroup className="p-0">
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    const option = options.find(
+                    const o = options.find(
                       (o) => o.value === currentValue
                     );
-                    field.onChange(option?.value);
+                    const value = o?.value === field.value ? '' : o?.value;
+
+                    field.onChange(value);
+                    onChange?.(value || '');
+
+                    if (value && o) {
+                      setSearch(o.label);
+                    } else {
+                      setSearch('');
+                    }
                     setOpen(false);
-                    onChange?.(option?.value || '');
                   }}
                 >
                   {option.label}
